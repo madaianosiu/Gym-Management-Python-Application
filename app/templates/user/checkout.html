@@ -1,0 +1,344 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Checkout{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .checkout-wrap {
+    max-width: 980px;
+    margin: 28px auto 40px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+  }
+
+  .checkout-card {
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(72, 115, 255, 0.18), transparent 28%),
+      linear-gradient(180deg, rgba(18, 25, 57, 0.96), rgba(8, 14, 36, 0.98));
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    padding: 28px;
+  }
+
+  .checkout-kicker {
+    display: inline-flex;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 160, 255, 0.18);
+    background: rgba(21, 31, 73, 0.45);
+    color: #b9c8ff;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .checkout-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0 0 10px;
+    color: #f4f7ff;
+  }
+
+  .checkout-sub {
+    color: rgba(226, 232, 255, 0.78);
+    margin-bottom: 24px;
+  }
+
+  .plan-summary {
+    display: grid;
+    gap: 16px;
+  }
+
+  .plan-summary-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .plan-summary-name {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+
+  .plan-summary-label {
+    color: rgba(210, 220, 255, 0.64);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .plan-summary-price {
+    text-align: right;
+  }
+
+  .plan-summary-price strong {
+    display: block;
+    font-size: 42px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .plan-summary-price span {
+    color: rgba(210, 220, 255, 0.72);
+  }
+
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .plan-box {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .plan-box small {
+    display: block;
+    margin-bottom: 6px;
+    color: rgba(210, 220, 255, 0.62);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .plan-box strong {
+    color: #f4f7ff;
+    font-size: 18px;
+  }
+
+  .checkout-form {
+    display: grid;
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  .checkout-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #eef3ff;
+  }
+
+  .checkout-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: #fff;
+    outline: none;
+  }
+
+  .checkout-form input::placeholder {
+    color: rgba(220,228,255,0.42);
+  }
+
+  .checkout-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .empty-plan {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.12);
+    color: rgba(228, 235, 255, 0.78);
+  }
+
+  .membership-note {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: rgba(56, 91, 212, 0.12);
+    border: 1px solid rgba(110, 146, 255, 0.2);
+    color: rgba(228, 235, 255, 0.9);
+  }
+
+  @media (max-width: 900px) {
+    .checkout-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="checkout-wrap">
+  <div class="checkout-card">
+    <div class="checkout-kicker">Secure checkout</div>
+    <h1 class="checkout-title">
+      Complete your
+      {% if selected_product %}store order{% else %}membership{% endif %}
+    </h1>
+    <p class="checkout-sub">
+      This payment is validated in the app and then stored in Firebase so the order flow stays simple and trackable.
+    </p>
+
+    {% if selected_plan or selected_product or cart_products %}
+      {% set selected_item = selected_product if selected_product else selected_plan %}
+      <div class="plan-summary">
+        <div class="plan-summary-top">
+          <div>
+            <div class="plan-summary-label">
+              {% if cart_products %}Cart checkout{% elif selected_product %}Selected product{% else %}Selected plan{% endif %}
+            </div>
+            <h2 class="plan-summary-name">
+              {% if cart_products %}{{ cart_products|length }} items ready to pay{% else %}{{ selected_item.name }}{% endif %}
+            </h2>
+          </div>
+
+          <div class="plan-summary-price">
+            <strong>${% if cart_products %}{{ cart_total }}{% else %}{{ selected_item.price }}{% endif %}</strong>
+            <span>
+              {% if cart_products %}cart total{% elif selected_product %}one-time{% else %}/ {{ selected_item.duration_days }} days{% endif %}
+            </span>
+          </div>
+        </div>
+
+        <div class="plan-grid">
+          <div class="plan-box">
+            <small>{% if cart_products %}Items{% elif selected_product %}Product{% else %}Plan{% endif %}</small>
+            <strong>{% if cart_products %}{{ cart_products|length }} selected{% else %}{{ selected_item.name }}{% endif %}</strong>
+          </div>
+          <div class="plan-box">
+            <small>{% if cart_products %}Type{% elif selected_product %}Type{% else %}Duration{% endif %}</small>
+            <strong>
+              {% if cart_products %}Store cart{% elif selected_product %}Store item{% else %}{{ selected_item.duration_days }} days{% endif %}
+            </strong>
+          </div>
+        </div>
+
+        {% if cart_products %}
+          <div class="membership-note">
+            {% for product in cart_products %}
+              <div>{{ product.name }} - ${{ product.price }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if membership and membership.plan_name and not selected_product %}
+        <div class="membership-note">
+          Current saved membership: <strong>{{ membership.plan_name }}</strong>.
+          Completing this checkout will replace the active plan on your account.
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-plan">
+        No membership selected yet. Go back and choose a plan first.
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="checkout-card">
+    <div class="checkout-kicker">Member payment</div>
+    <h2 style="margin:0 0 10px; color:#fff;">Card details</h2>
+    <p class="checkout-sub" style="margin-bottom:18px;">
+      This is still a demo payment flow, but successful checkout now writes payment and subscription data to Firebase.
+    </p>
+
+    <form class="checkout-form" method="post" action="{{ url_for('user.checkout_submit') }}">
+      <input type="hidden" name="plan_id" value="{{ selected_plan.id if selected_plan else '' }}" />
+      <input type="hidden" name="product_id" value="{{ selected_product.id if selected_product else '' }}" />
+      <input type="hidden" name="checkout_mode" value="{{ 'cart' if cart_products else '' }}" />
+
+      <div>
+        <label for="card_name">Cardholder name</label>
+        <input
+          id="card_name"
+          name="card_name"
+          type="text"
+          placeholder="Full name"
+          value="{{ request.form.get('card_name', cardholder_name or '') }}"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="card_number">Card number</label>
+        <input
+          id="card_number"
+          name="card_number"
+          type="text"
+          inputmode="numeric"
+          placeholder="1234 5678 9012 3456"
+          value="{{ request.form.get('card_number', '') }}"
+          required
+        />
+      </div>
+
+      <div class="plan-grid">
+        <div>
+          <label for="expiry">Expiry</label>
+          <input
+            id="expiry"
+            name="expiry"
+            type="text"
+            placeholder="MM/YY"
+            value="{{ request.form.get('expiry', '') }}"
+            required
+          />
+        </div>
+        <div>
+          <label for="cvv">CVV</label>
+          <input
+            id="cvv"
+            name="cvv"
+            type="text"
+            inputmode="numeric"
+            placeholder="123"
+            value="{{ request.form.get('cvv', '') }}"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="checkout-actions">
+        <a class="btn btn-ghost" href="{{ url_for('user.cart') if cart_products else (url_for('public.store') if selected_product else url_for('user.memberships')) }}">
+          Back to {% if cart_products %}cart{% elif selected_product %}store{% else %}plans{% endif %}
+        </a>
+        <button class="btn btn-primary" type="submit">Complete payment</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  (() => {
+    const card = document.getElementById("card_number");
+    const expiry = document.getElementById("expiry");
+    const cvv = document.getElementById("cvv");
+
+    card?.addEventListener("input", () => {
+      const digits = card.value.replace(/\D/g, "").slice(0, 19);
+      card.value = digits.replace(/(.{4})/g, "$1 ").trim();
+    });
+
+    expiry?.addEventListener("input", () => {
+      const digits = expiry.value.replace(/\D/g, "").slice(0, 4);
+      expiry.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+    });
+
+    cvv?.addEventListener("input", () => {
+      cvv.value = cvv.value.replace(/\D/g, "").slice(0, 4);
+    });
+  })();
+</script>
+{% endblock %}

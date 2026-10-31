@@ -1,0 +1,595 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Home{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" />
+<style>
+  .home-shell {
+    display: grid;
+    gap: 26px;
+  }
+
+  .home-hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    padding: 30px;
+    border-radius: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      radial-gradient(circle at 85% 18%, rgba(77, 128, 255, 0.22), transparent 22%),
+      radial-gradient(circle at 8% 0%, rgba(33, 80, 195, 0.2), transparent 34%),
+      linear-gradient(145deg, rgba(10, 16, 38, 0.98), rgba(5, 9, 24, 0.98));
+    box-shadow:
+      0 28px 70px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -60px auto;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(63, 109, 255, 0.24), transparent 65%);
+    pointer-events: none;
+  }
+
+  .home-hero-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    align-content: center;
+    gap: 18px;
+  }
+
+  .home-kicker {
+    display: inline-flex;
+    width: fit-content;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(150, 177, 255, 0.18);
+    background: rgba(35, 54, 117, 0.36);
+    color: #eef2ff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .home-title {
+    margin: 0;
+    font-size: clamp(48px, 7vw, 88px);
+    line-height: 0.92;
+    letter-spacing: -0.06em;
+    color: #f2f4ff;
+    max-width: 700px;
+  }
+
+  .home-title .accent {
+    color: #79a0ff;
+  }
+
+  .home-sub {
+    max-width: 650px;
+    margin: 0;
+    color: rgba(222, 230, 255, 0.82);
+    line-height: 1.75;
+    font-size: 19px;
+  }
+
+  .home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .home-proof {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .proof-card {
+    padding: 16px 18px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .proof-card strong {
+    display: block;
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .proof-card span {
+    color: rgba(213, 223, 255, 0.74);
+    font-size: 14px;
+  }
+
+  .home-visual {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 18px;
+    align-content: center;
+  }
+
+  .visual-main {
+    display: grid;
+    gap: 18px;
+    padding: 24px;
+    min-height: 430px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(16, 23, 54, 0.92), rgba(11, 17, 34, 0.98));
+  }
+
+  .visual-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .visual-topline span {
+    color: rgba(213, 224, 255, 0.78);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .visual-membership {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .visual-membership strong {
+    font-size: 34px;
+    color: #fff;
+  }
+
+  .visual-membership p,
+  .visual-feed p,
+  .visual-foot p {
+    margin: 0;
+    color: rgba(215, 224, 255, 0.78);
+    line-height: 1.7;
+  }
+
+  .visual-feed {
+    display: grid;
+    gap: 12px;
+  }
+
+  .feed-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .feed-row strong {
+    color: #fff;
+  }
+
+  .feed-chip {
+    display: inline-flex;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(47, 107, 255, 0.15);
+    color: #dbe5ff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .visual-foot {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .foot-card {
+    padding: 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .home-band {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+  }
+
+  .band-card {
+    padding: 26px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(15, 22, 50, 0.94), rgba(8, 13, 30, 0.98));
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.24);
+  }
+
+  .band-card h2 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 34px;
+    letter-spacing: -0.04em;
+  }
+
+  .band-card p {
+    margin: 0;
+    color: rgba(217, 226, 255, 0.78);
+    line-height: 1.75;
+  }
+
+  .band-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .band-list div {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: rgba(229, 235, 255, 0.84);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .feature-card {
+    padding: 24px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(14, 21, 47, 0.96), rgba(8, 12, 27, 0.98));
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+  }
+
+  .feature-card img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .feature-card h3 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 30px;
+    letter-spacing: -0.04em;
+  }
+
+  .feature-card p {
+    margin: 0 0 16px;
+    color: rgba(217, 226, 255, 0.78);
+    line-height: 1.72;
+  }
+
+  .feature-list {
+    display: grid;
+    gap: 8px;
+    color: rgba(231, 236, 255, 0.84);
+  }
+
+  .home-cta {
+    padding: 30px;
+    border-radius: 32px;
+    border: 1px solid rgba(120, 156, 255, 0.16);
+    background:
+      radial-gradient(circle at 10% 10%, rgba(66, 111, 255, 0.18), transparent 28%),
+      linear-gradient(145deg, rgba(13, 19, 44, 0.98), rgba(7, 11, 25, 0.98));
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.3);
+  }
+
+  .home-cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .home-cta h2 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 54px);
+    letter-spacing: -0.05em;
+  }
+
+  .home-cta p {
+    margin: 0;
+    max-width: 720px;
+    color: rgba(217, 226, 255, 0.8);
+    line-height: 1.75;
+    font-size: 18px;
+  }
+
+  @media (max-width: 1100px) {
+    .home-hero,
+    .home-band,
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .home-proof {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .home-hero,
+    .home-cta,
+    .band-card,
+    .feature-card {
+      padding: 22px;
+    }
+
+    .visual-foot,
+    .home-cta-inner {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .home-title {
+      font-size: 46px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set current_user = session.get("user") %}
+
+<section class="home-shell">
+  <section class="home-hero">
+    <div class="home-hero-copy">
+      {% if current_user %}
+        <div class="home-kicker">
+          Welcome back{% if current_user.get("full_name") %}, {{ current_user.get("full_name") }}{% endif %} | Member mode
+        </div>
+        <h1 class="home-title">Your <span class="accent">next session</span> starts here.</h1>
+        <p class="home-sub">
+          GYM+ should feel different once you are logged in. Go straight to your dashboard, manage your plan, open the store, and continue from where you left off without guest-style detours.
+        </p>
+        <div class="home-actions">
+          <a class="btn btn-primary" href="{{ url_for('user.dashboard') }}">Open dashboard</a>
+          <a class="btn btn-ghost" href="{{ url_for('user.memberships') }}">Manage memberships</a>
+          <a class="btn btn-ghost" href="{{ url_for('public.store') }}">Visit store</a>
+        </div>
+
+        <div class="home-proof">
+          <div class="proof-card">
+            <strong>1</strong>
+            <span>member flow designed around your account</span>
+          </div>
+          <div class="proof-card">
+            <strong>24/7</strong>
+            <span>access to memberships, store, and profile actions</span>
+          </div>
+          <div class="proof-card">
+            <strong>0</strong>
+            <span>unnecessary guest actions while you are already signed in</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="home-kicker">AI-ready | Premium training experience</div>
+        <h1 class="home-title">Build the <span class="accent">strongest version</span> of yourself.</h1>
+        <p class="home-sub">
+          A sharper gym platform for memberships, premium store products, streamlined checkout, and a member journey that feels modern from the first click.
+        </p>
+        <div class="home-actions">
+          <a class="btn btn-primary" href="{{ url_for('public.pricing') }}">View memberships</a>
+          <a class="btn btn-ghost" href="{{ url_for('auth.register_view') }}">Start now</a>
+          <a class="btn btn-ghost" href="{{ url_for('public.store') }}">Explore store</a>
+        </div>
+
+        <div class="home-proof">
+          <div class="proof-card">
+            <strong>3</strong>
+            <span>membership levels tuned for different training styles</span>
+          </div>
+          <div class="proof-card">
+            <strong>5</strong>
+            <span>store essentials ready for recovery, apparel, and gear</span>
+          </div>
+          <div class="proof-card">
+            <strong>1</strong>
+            <span>clean member flow from signup to dashboard</span>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="home-visual">
+      <div class="visual-main">
+        <div class="visual-topline">
+          <span>GYM+ Experience</span>
+          <span>{% if current_user %}Member ready{% else %}Open to join{% endif %}</span>
+        </div>
+
+        <div class="visual-membership">
+          <strong>{% if current_user %}Dashboard first{% else %}3 membership tiers{% endif %}</strong>
+          <p>
+            {% if current_user %}
+              Your account, next steps, store access, and membership choices stay close together so the homepage becomes a real start point, not just a generic welcome screen.
+            {% else %}
+              From Basic to Elite, the platform is built to guide someone from discovery to checkout without clutter, confusion, or dead-end actions.
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="visual-feed">
+          <div class="feed-row">
+            <div>
+              <strong>{% if current_user %}Memberships{% else %}Plans{% endif %}</strong>
+              <p>{% if current_user %}Open the polished member plans page instantly.{% else %}Clear pricing and real benefits for each plan.{% endif %}</p>
+            </div>
+            <span class="feed-chip">{% if current_user %}Ready{% else %}Live{% endif %}</span>
+          </div>
+          <div class="feed-row">
+            <div>
+              <strong>Store</strong>
+              <p>{% if current_user %}Add products to cart and continue to checkout from one flow.{% else %}Supplements, gear, apparel, and essentials in one place.{% endif %}</p>
+            </div>
+            <span class="feed-chip">Curated</span>
+          </div>
+          <div class="feed-row">
+            <div>
+              <strong>{% if current_user %}Account route{% else %}Smart auth{% endif %}</strong>
+              <p>{% if current_user %}Signed-in users stay on member pages, not guest routes.{% else %}Login, signup, and Firebase auth are already connected to the right destinations.{% endif %}</p>
+            </div>
+            <span class="feed-chip">{% if current_user %}Smooth{% else %}Protected{% endif %}</span>
+          </div>
+        </div>
+
+        <div class="visual-foot">
+          <div class="foot-card">
+            <strong>{% if current_user %}One click{% else %}Payments{% endif %}</strong>
+            <p>{% if current_user %}to your dashboard, memberships, and store.{% else %}mock-to-real checkout flow prepared for growth.{% endif %}</p>
+          </div>
+          <div class="foot-card">
+            <strong>{% if current_user %}Member-first{% else %}Firebase ready{% endif %}</strong>
+            <p>{% if current_user %}experience once your session starts.{% else %}for auth, messages, orders, and memberships.{% endif %}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-band">
+    <article class="band-card">
+      {% if current_user %}
+        <h2>Your start page should actually help you move.</h2>
+        <p>
+          Instead of sending you back into signup and guest actions, this homepage now behaves like a proper member entry point. It points you toward the dashboard, active choices, and the parts of the platform that matter once you are inside.
+        </p>
+        <div class="band-list">
+          <div>Dashboard and memberships stay in the foreground</div>
+          <div>Store products are close when you want to add gear or supplements</div>
+          <div>Guest-only prompts are replaced by member-first navigation</div>
+        </div>
+      {% else %}
+        <h2>More than a landing page. It should feel like a premium gym brand.</h2>
+        <p>
+          GYM+ is not just a place to buy a membership. It is a cleaner digital front door for training plans, checkout, product sales, member management, and a strong visual identity that feels intentional.
+        </p>
+        <div class="band-list">
+          <div>Membership plans with distinct benefits and clear positioning</div>
+          <div>Store integration for protein, shaker, apparel, and training gear</div>
+          <div>Modern account flow from login to dashboard and checkout</div>
+        </div>
+      {% endif %}
+    </article>
+
+    <article class="band-card">
+      <h2>{% if current_user %}Quick route{% else %}Why people would choose GYM+{% endif %}</h2>
+      <div class="band-list">
+        {% if current_user %}
+          <div>Go to your dashboard and check the latest status of your account</div>
+          <div>Browse plans again if you want to upgrade or compare tiers</div>
+          <div>Open the store and build a cart before checkout</div>
+          <div>Use the homepage as a launchpad, not just a placeholder screen</div>
+        {% else %}
+          <div>Sharper dark UI with a cleaner, more premium feeling</div>
+          <div>Flexible memberships with visible differences between plans</div>
+          <div>Integrated store and checkout flow in the same ecosystem</div>
+          <div>Separate admin and customer experiences for real product growth</div>
+        {% endif %}
+      </div>
+    </article>
+  </section>
+
+  <section class="feature-grid">
+    <article class="feature-card">
+      <img src="{{ url_for('static', filename='img/about-space.svg') }}" alt="Gym atmosphere" />
+      <h3>Premium atmosphere</h3>
+      <p>
+        The experience should feel disciplined, modern, and motivating from the homepage to checkout, with a look that says performance instead of template.
+      </p>
+      <div class="feature-list">
+        <div>Focused visual direction</div>
+        <div>Strong hierarchy and cleaner spacing</div>
+        <div>Premium dark presentation without feeling flat</div>
+      </div>
+    </article>
+
+    <article class="feature-card">
+      <img src="{{ url_for('static', filename='img/about-energy.svg') }}" alt="Training energy" />
+      <h3>Member journey</h3>
+      <p>
+        The platform now supports a much clearer route between discovery, memberships, store browsing, cart, payment, and dashboard continuity.
+      </p>
+      <div class="feature-list">
+        <div>Login-aware homepage behavior</div>
+        <div>Direct path to memberships and store</div>
+        <div>Cleaner post-login experience</div>
+      </div>
+    </article>
+
+    <article class="feature-card">
+      <img src="{{ url_for('static', filename='img/about-recovery.svg') }}" alt="Recovery support" />
+      <h3>Built to expand</h3>
+      <p>
+        GYM+ already stretches beyond a simple gym landing page, with customer and admin areas, store management, Firebase-connected data flows, and room for future coaching features.
+      </p>
+      <div class="feature-list">
+        <div>Admin and customer areas split properly</div>
+        <div>Product catalog and message handling included</div>
+        <div>Ready for richer AI or coaching layers later</div>
+      </div>
+    </article>
+  </section>
+
+  <section class="home-cta">
+    <div class="home-cta-inner">
+      <div>
+        {% if current_user %}
+          <h2>Stay in motion.</h2>
+          <p>
+            Open your dashboard, browse the store, or go back to memberships without losing momentum. The homepage should help you continue, not restart.
+          </p>
+        {% else %}
+          <h2>Start stronger with GYM+.</h2>
+          <p>
+            Choose the plan that fits your style, explore the store, and move into a cleaner digital gym experience that feels premium from day one.
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="home-actions">
+        {% if current_user %}
+          <a class="btn btn-primary" href="{{ url_for('user.dashboard') }}">Go to dashboard</a>
+          <a class="btn btn-ghost" href="{{ url_for('public.store') }}">Shop essentials</a>
+        {% else %}
+          <a class="btn btn-primary" href="{{ url_for('auth.register_view') }}">Create account</a>
+          <a class="btn btn-ghost" href="{{ url_for('public.pricing') }}">See plans</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+</section>
+{% endblock %}

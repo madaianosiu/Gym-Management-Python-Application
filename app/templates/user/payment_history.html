@@ -1,0 +1,118 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Payment history{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .history-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .history-card {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.03);
+  }
+
+  .history-card h2 {
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: 22px;
+  }
+
+  .history-card p {
+    margin: 0;
+  }
+
+  .history-meta {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+  }
+
+  .history-total {
+    color: var(--text);
+    font-size: 24px;
+    font-weight: 900;
+    text-align: right;
+  }
+
+  .history-empty {
+    padding: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.03);
+  }
+
+  @media (max-width: 760px) {
+    .history-card {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .history-total {
+      text-align: left;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="user-head">
+  <div>
+    <h1 class="h1">Payment history</h1>
+    <p class="p">Your successful memberships, store orders, and cart checkouts stay linked to your account.</p>
+  </div>
+  <div class="user-actions">
+    <a class="btn btn-ghost" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+    <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">Memberships</a>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+{% if payments %}
+  <section class="history-grid">
+    {% for payment in payments %}
+      {% set title = payment.plan_name or payment.item_name or ("Cart checkout" if payment.item_type == "cart" else "Payment") %}
+      <article class="history-card">
+        <div>
+          <h2>{{ title }}</h2>
+          <div class="history-meta">
+            <p>{{ payment.item_type|capitalize if payment.item_type else "Membership" }}</p>
+            <p>Paid on {{ payment.created_at[:10] if payment.created_at else "Date unavailable" }}</p>
+            <p>Card **** {{ payment.card_last4 if payment.card_last4 else "--" }}</p>
+          </div>
+        </div>
+
+        <div class="history-meta">
+          <p><strong>Status:</strong> {{ payment.status or "SUCCESS" }}</p>
+          <p><strong>Payment ID:</strong> {{ payment.id }}</p>
+          {% if payment.item_count %}
+            <p><strong>Items:</strong> {{ payment.item_count }}</p>
+          {% endif %}
+          <p><a class="btn btn-ghost" href="{{ url_for('user.payment_receipt', payment_id=payment.id) }}">View receipt</a></p>
+        </div>
+
+        <div class="history-total">
+          {{ payment.currency or "USD" }} {{ payment.amount }}
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="history-empty">
+    <h2 class="h2">No payments yet</h2>
+    <p class="p">Complete a membership or store checkout and it will appear here automatically.</p>
+    <div class="spacer"></div>
+    <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">Choose a plan</a>
+  </section>
+{% endif %}
+{% endblock %}

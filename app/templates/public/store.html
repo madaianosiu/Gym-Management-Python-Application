@@ -1,0 +1,236 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Store{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" />
+<style>
+  .store-shell {
+    margin-top: 14px;
+    display: grid;
+    gap: 26px;
+  }
+
+  .store-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+  }
+
+  .store-kicker {
+    display: inline-flex;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 160, 255, 0.2);
+    background: rgba(19, 29, 69, 0.54);
+    color: #c6d3ff;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .store-sub {
+    max-width: 720px;
+    color: rgba(224, 231, 255, 0.8);
+    line-height: 1.75;
+  }
+
+  .store-note {
+    padding: 22px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(47, 107, 255, 0.24), transparent 30%),
+      rgba(255,255,255,0.035);
+    min-width: 250px;
+  }
+
+  .store-note strong {
+    display: block;
+    color: #fff;
+    font-size: 30px;
+    margin-bottom: 8px;
+  }
+
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .store-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      linear-gradient(180deg, rgba(16, 24, 56, 0.96), rgba(7, 12, 29, 0.98));
+    box-shadow:
+      0 18px 50px rgba(0,0,0,0.24),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .store-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(38, 240, 208, 0.22);
+    box-shadow:
+      0 28px 64px rgba(0,0,0,0.32),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .store-media {
+    min-height: 230px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background-color: rgba(8, 12, 30, 0.9);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 82%;
+  }
+
+  .store-body {
+    display: flex;
+    min-height: 340px;
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .store-tag {
+    display: inline-flex;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(67, 102, 247, 0.16);
+    border: 1px solid rgba(124, 154, 255, 0.25);
+    color: #d9e4ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .store-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .store-name {
+    margin: 0;
+    font-size: 28px;
+    color: #fff;
+    line-height: 1.05;
+  }
+
+  .store-price {
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .store-copy {
+    color: rgba(223, 231, 255, 0.76);
+    line-height: 1.75;
+    min-height: 86px;
+  }
+
+  .store-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 20px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .store-list li {
+    color: rgba(231, 237, 255, 0.82);
+  }
+
+  .store-actions {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  @media (max-width: 1100px) {
+    .store-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 860px) {
+    .store-hero,
+    .store-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="store-shell">
+  <section class="store-hero">
+    <div>
+      <div class="store-kicker">GYM+ Store</div>
+      <h1 class="h1">Train harder, recover smarter, and wear the brand with pride.</h1>
+      <p class="p store-sub">
+        A clean store collection for members who want practical essentials, recovery support,
+        and simple gym gear that fits the GYM+ experience.
+      </p>
+    </div>
+
+    <div class="store-note">
+      {% if session.get("user") %}
+        <strong>{{ cart_count }}</strong>
+        <div class="muted">{{ "item" if cart_count == 1 else "items" }} currently saved in your cart</div>
+        <div class="spacer"></div>
+        <a class="btn btn-ghost btn-block" href="{{ url_for('user.cart') }}">Open cart</a>
+      {% else %}
+        <strong>{{ products|length }}</strong>
+        <div class="muted">curated essentials for training, recovery, and gym lifestyle</div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="store-grid">
+    {% for product in products %}
+      <article class="store-card">
+        <div class="store-media" style="background-image: url('{{ url_for('static', filename=product.image) }}');"></div>
+
+        <div class="store-body">
+          <div class="store-tag">{{ product.tag }}</div>
+
+          <div class="store-head">
+            <h2 class="store-name">{{ product.name }}</h2>
+            <div class="store-price">${{ product.price }}</div>
+          </div>
+
+          <p class="store-copy">{{ product.description }}</p>
+
+          <ul class="store-list">
+            {% for feature in product.features %}
+              <li>- {{ feature }}</li>
+            {% endfor %}
+          </ul>
+
+          <div class="store-actions">
+            {% if session.get("user") %}
+              <form method="post" action="{{ url_for('user.cart_add', product_id=product.id) }}">
+                <button class="btn btn-primary btn-block" type="submit">Buy now</button>
+              </form>
+            {% else %}
+              <a class="btn btn-primary btn-block" href="{{ url_for('auth.login_view') }}">Login to buy</a>
+              <a class="btn btn-ghost btn-block" href="{{ url_for('auth.register_view') }}">Create account</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

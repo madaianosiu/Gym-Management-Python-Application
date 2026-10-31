@@ -1,0 +1,718 @@
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .nav-links {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .container,
+  .auth-wrap {
+    width: min(94vw, 760px);
+  }
+
+  .nav-inner {
+    padding: 10px 0;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .nav-actions .btn {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .brand {
+    font-size: 17px;
+  }
+
+  main.container {
+    padding: 22px 0 48px;
+  }
+
+  .page-tools {
+    margin-bottom: 14px;
+  }
+
+  .back-button {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .h1 {
+    font-size: 36px;
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .h2 {
+    font-size: 24px;
+    letter-spacing: 0;
+  }
+
+  .p {
+    font-size: 15px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 8px;
+  }
+
+  .user-head {
+    align-items: flex-start;
+  }
+
+  .user-actions {
+    width: 100%;
+  }
+
+  .user-actions .btn {
+    flex: 1 1 150px;
+  }
+}
+
+@media (max-width: 760px) {
+  .container,
+  .auth-wrap {
+    width: min(94vw, 520px);
+  }
+
+  .nav-actions .btn-ghost {
+    display: none;
+  }
+
+  .side-menu-toggle {
+    bottom: 16px;
+    left: 14px;
+    top: auto;
+    min-height: 44px;
+    padding: 0 14px;
+  }
+
+  .side-menu-links a {
+    min-height: 50px;
+    font-size: 34px;
+    letter-spacing: 0;
+  }
+
+  .footer-inner,
+  .footer-links-block {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-links-block {
+    justify-self: stretch;
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+  }
+
+  .card,
+  .card-pad,
+  .auth-showcase,
+  .auth-panel,
+  .checkout-card,
+  .cart-item,
+  .cart-summary,
+  .cart-empty,
+  .dash-hero,
+  .dash-card,
+  .dash-store-copy,
+  .dash-store-visual,
+  .store-card,
+  .store-note,
+  .admin-hero,
+  .admin-card,
+  .admin-panel,
+  .product-card,
+  .message-card,
+  .success-hero,
+  .success-card,
+  .history-card,
+  .history-empty {
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .h1 {
+    font-size: 32px;
+  }
+
+  .auth-login-shell,
+  .home-hero,
+  .home-band,
+  .feature-grid,
+  .home-cta-inner,
+  .about-hero,
+  .about-grid,
+  .about-benefits,
+  .plans-grid,
+  .membership-grid,
+  .classes-grid,
+  .receipt-grid,
+  .checkout-wrap,
+  .cart-layout,
+  .dash-hero-grid,
+  .dash-overview,
+  .dash-store,
+  .store-hero,
+  .store-grid,
+  .admin-grid,
+  .admin-stats,
+  .store-admin-layout,
+  .product-card,
+  .success-grid,
+  .history-card {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-showcase,
+  .auth-panel {
+    padding: 20px;
+  }
+
+  .home-hero,
+  .home-band,
+  .home-cta,
+  .about-visual,
+  .about-card,
+  .about-photo,
+  .story-band,
+  .proof-card,
+  .band-card,
+  .feature-card {
+    border-radius: 8px;
+  }
+
+  .home-hero,
+  .home-cta {
+    padding: 18px;
+  }
+
+  .home-hero::after {
+    display: none;
+  }
+
+  .home-title,
+  .about-title,
+  .home-cta h2 {
+    font-size: 34px;
+    line-height: 1.04;
+    letter-spacing: 0;
+  }
+
+  .home-sub,
+  .about-lead,
+  .home-cta p {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .home-actions,
+  .about-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .home-actions .btn,
+  .about-actions .btn {
+    width: 100%;
+  }
+
+  .home-proof,
+  .visual-foot,
+  .about-visual-badge {
+    grid-template-columns: 1fr;
+  }
+
+  .visual-main {
+    min-height: auto;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .visual-membership {
+    border-radius: 8px;
+  }
+
+  .visual-membership strong {
+    font-size: 26px;
+  }
+
+  .feed-row,
+  .visual-foot {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .about-visual {
+    min-height: 330px;
+  }
+
+  .about-visual::before {
+    inset: 10px;
+    border-radius: 8px;
+  }
+
+  .about-visual-badge {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .about-stat,
+  .about-card,
+  .benefit-item {
+    border-radius: 8px;
+  }
+
+  .about-photo-stack {
+    min-height: 260px;
+  }
+
+  .plans-hero {
+    margin: 10px 0 18px;
+  }
+
+  .plans-grid {
+    gap: 16px;
+    margin-top: 18px;
+    perspective: none;
+  }
+
+  .plan-card,
+  .plan-card-inner,
+  .plan-face-inner {
+    min-height: auto;
+  }
+
+  .plan-card {
+    display: block;
+  }
+
+  .plan-card-inner {
+    transform-style: flat;
+  }
+
+  .plan-card.is-flipped .plan-card-inner {
+    transform: none;
+  }
+
+  .plan-face {
+    position: relative;
+    inset: auto;
+    border-radius: 8px;
+    backface-visibility: visible;
+  }
+
+  .plan-face.back {
+    display: none;
+    transform: none;
+    margin-top: 12px;
+  }
+
+  .plan-card.is-flipped .plan-face.front {
+    display: none;
+  }
+
+  .plan-card.is-flipped .plan-face.back {
+    display: block;
+  }
+
+  .plan-face-inner {
+    padding: 18px;
+  }
+
+  .plan-name {
+    font-size: 25px;
+  }
+
+  .plan-price strong {
+    font-size: 36px;
+  }
+
+  .plan-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .plan-actions .btn {
+    width: 100%;
+  }
+
+  .auth-head .h1 {
+    font-size: 34px;
+    letter-spacing: 0;
+  }
+
+  .auth-head .p {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .mascot-stage {
+    max-width: 180px;
+  }
+
+  .dash-hero {
+    padding: 18px;
+  }
+
+  .dash-hero::after {
+    display: none;
+  }
+
+  .dash-kicker,
+  .ai-spotlight-kicker,
+  .checkout-kicker,
+  .store-kicker,
+  .admin-kicker {
+    letter-spacing: 0;
+    font-size: 11px;
+  }
+
+  .dash-title {
+    font-size: 34px;
+    line-height: 1.02;
+    letter-spacing: 0;
+  }
+
+  .dash-lead {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .ai-spotlight {
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  .ai-spotlight-inner {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .ai-spotlight-title {
+    font-size: 22px;
+    line-height: 1.08;
+  }
+
+  .ai-spotlight-copy {
+    font-size: 13px;
+  }
+
+  .ai-spotlight-action {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .dash-actions,
+  .dash-store-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .dash-actions .btn,
+  .dash-store-actions .btn {
+    width: 100%;
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .dash-status-panel,
+  .dash-card,
+  .dash-store-copy {
+    padding: 18px;
+  }
+
+  .dash-status-top {
+    align-items: flex-start;
+  }
+
+  .dash-status-top strong {
+    font-size: 24px;
+  }
+
+  .dash-mini-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-mini-card {
+    padding: 14px;
+  }
+
+  .dash-mini-card strong {
+    font-size: 17px;
+  }
+
+  .dash-card {
+    min-height: auto;
+  }
+
+  .dash-card h3 {
+    font-size: 24px;
+  }
+
+  .dash-store-visual {
+    min-height: 210px;
+  }
+
+  .dash-store-copy h2 {
+    font-size: 30px;
+    letter-spacing: 0;
+  }
+
+  .ai-drawer {
+    width: 100vw;
+    padding: 10px;
+  }
+
+  .ai-panel {
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .ai-panel h3 {
+    font-size: 24px;
+  }
+
+  .ai-form {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-message.user,
+  .ai-message.bot {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .store-shell {
+    margin-top: 0;
+  }
+
+  .store-hero {
+    align-items: stretch;
+  }
+
+  .store-note {
+    min-width: 0;
+  }
+
+  .store-media {
+    min-height: 190px;
+    background-size: 78%;
+  }
+
+  .store-body {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .store-head {
+    align-items: flex-start;
+  }
+
+  .store-name,
+  .store-price {
+    font-size: 24px;
+  }
+
+  .store-copy {
+    min-height: 0;
+  }
+
+  .cart-item {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .cart-item-media {
+    min-height: 170px;
+  }
+
+  .cart-price {
+    text-align: left;
+  }
+
+  .cart-summary,
+  .cart-empty {
+    padding: 18px;
+  }
+
+  .cart-summary h2 {
+    font-size: 28px;
+  }
+
+  .checkout-wrap {
+    margin: 8px auto 28px;
+    gap: 16px;
+  }
+
+  .checkout-card {
+    padding: 18px;
+  }
+
+  .checkout-title {
+    font-size: 32px;
+    letter-spacing: 0;
+  }
+
+  .plan-summary-top,
+  .product-top,
+  .message-head,
+  .admin-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .plan-summary-price {
+    text-align: left;
+  }
+
+  .plan-summary-name {
+    font-size: 25px;
+  }
+
+  .plan-summary-price strong {
+    font-size: 34px;
+  }
+
+  .plan-grid,
+  .product-form-grid,
+  .message-form {
+    grid-template-columns: 1fr;
+  }
+
+  .product-form-grid .span-2 {
+    grid-column: auto;
+  }
+
+  .checkout-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-actions .btn {
+    width: 100%;
+  }
+
+  .admin-hero,
+  .admin-card,
+  .admin-panel,
+  .product-card,
+  .message-card {
+    padding: 18px;
+  }
+
+  .admin-title,
+  .admin-hero h1 {
+    font-size: 32px;
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .admin-stat strong {
+    font-size: 30px;
+  }
+
+  .product-preview {
+    min-height: 160px;
+  }
+
+  .product-price {
+    min-height: 44px;
+    font-size: 23px;
+  }
+
+  .product-actions,
+  .admin-action-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .product-actions .btn,
+  .admin-action-row .admin-danger {
+    width: 100%;
+  }
+
+  .success-hero,
+  .success-card,
+  .history-empty {
+    padding: 18px;
+  }
+
+  .history-total {
+    text-align: left;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .container,
+  .auth-wrap {
+    width: 94vw;
+  }
+
+  .nav-actions .btn {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .h1,
+  .dash-title,
+  .checkout-title,
+  .admin-title,
+  .admin-hero h1 {
+    font-size: 29px;
+  }
+
+  .dash-actions,
+  .dash-store-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .side-menu-links a {
+    font-size: 30px;
+  }
+
+  .store-head {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

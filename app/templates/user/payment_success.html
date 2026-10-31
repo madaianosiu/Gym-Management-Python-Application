@@ -1,0 +1,197 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Payment success{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .success-shell {
+    display: grid;
+    gap: 22px;
+  }
+
+  .success-hero,
+  .success-card {
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    background:
+      radial-gradient(circle at top right, rgba(38,240,208,.14), transparent 28%),
+      linear-gradient(180deg, rgba(16,24,56,.96), rgba(8,12,29,.99));
+    box-shadow: 0 22px 58px rgba(0,0,0,.26);
+  }
+
+  .success-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 30px;
+  }
+
+  .success-mark {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(38,240,208,.32);
+    background: rgba(38,240,208,.12);
+    color: #8dffe3;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 12px;
+  }
+
+  .success-card {
+    padding: 24px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .success-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .success-box {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+  }
+
+  .success-box small {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 11px;
+  }
+
+  .success-box strong {
+    color: #fff;
+    overflow-wrap: anywhere;
+  }
+
+  .success-items {
+    display: grid;
+    gap: 8px;
+    color: rgba(230,236,255,.84);
+  }
+
+  @media (max-width: 860px) {
+    .success-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .success-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set checkout_membership = last_checkout.get("membership") if last_checkout else {} %}
+{% set saved_membership = membership or checkout_membership or {} %}
+{% set checkout_kind = last_checkout.get("kind") if last_checkout else "" %}
+{% set checkout_items = last_checkout.get("items") if last_checkout else [] %}
+
+<section class="success-shell">
+  <section class="success-hero">
+    <div>
+      <div class="success-mark">Payment confirmed</div>
+      <h1 class="h1">Payment successful</h1>
+      <p class="p">
+        {% if checkout_kind == "cart" %}
+          Your cart checkout was saved and linked to your account.
+        {% elif checkout_kind == "store" %}
+          Your store order was saved and linked to your account.
+        {% elif last_checkout %}
+          Your membership was saved and linked to your Firebase account.
+        {% else %}
+          Your latest payment is saved. Open payment history to review the receipt.
+        {% endif %}
+      </p>
+    </div>
+    <div class="user-actions">
+      <a class="btn btn-ghost" href="{{ url_for('user.payment_history') }}">View payment history</a>
+      <a class="btn btn-primary" href="{{ url_for('user.dashboard') }}">Go to dashboard</a>
+    </div>
+  </section>
+
+  <section class="success-card">
+    {% if last_checkout %}
+      <div class="success-grid">
+        <div class="success-box">
+          <small>Purchased</small>
+          <strong>
+            {% if checkout_kind == "cart" %}
+              Cart checkout
+            {% else %}
+              {{ last_checkout.get("name") }}
+            {% endif %}
+          </strong>
+        </div>
+        <div class="success-box">
+          <small>Total</small>
+          <strong>{{ last_checkout.get("currency") or "USD" }} {{ last_checkout.get("price") }}</strong>
+        </div>
+        <div class="success-box">
+          <small>Status</small>
+          <strong>{{ last_checkout.get("status") or "SUCCESS" }}</strong>
+        </div>
+        <div class="success-box">
+          <small>Card</small>
+          <strong>**** {{ last_checkout.get("card_last4") if last_checkout.get("card_last4") else "--" }}</strong>
+        </div>
+      </div>
+
+      {% if last_checkout.get("payment_id") %}
+        <div class="success-box">
+          <small>Payment ID</small>
+          <strong>{{ last_checkout.get("payment_id") }}</strong>
+        </div>
+      {% endif %}
+
+      {% if checkout_kind == "cart" and checkout_items %}
+        <div class="success-items">
+          {% for item in checkout_items %}
+            <div>{{ item.get("name") }} - ${{ item.get("price") }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      <p class="p">The receipt summary is no longer in this browser session, but saved payments remain available in payment history.</p>
+    {% endif %}
+
+    {% if saved_membership %}
+      <div class="success-grid">
+        <div class="success-box">
+          <small>Active plan</small>
+          <strong>{{ saved_membership.get("plan_name") }}</strong>
+        </div>
+        <div class="success-box">
+          <small>Plan status</small>
+          <strong>{{ saved_membership.get("status") }}</strong>
+        </div>
+        <div class="success-box">
+          <small>Valid until</small>
+          <strong>{{ saved_membership.get("end_date")[:10] if saved_membership.get("end_date") else "Not available" }}</strong>
+        </div>
+        <div class="success-box">
+          <small>Membership card</small>
+          <strong>**** {{ saved_membership.get("card_last4") if saved_membership.get("card_last4") else "--" }}</strong>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

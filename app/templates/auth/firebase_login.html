@@ -1,0 +1,94 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Firebase Login{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-head">
+    <h1 class="h1">Firebase Login</h1>
+    <p class="p">Sign in with your Firebase account.</p>
+  </div>
+
+  <div class="card card-pad">
+    <form class="form" id="fbLoginForm">
+      <div>
+        <label class="label" for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" autocomplete="email" required />
+      </div>
+
+      <div>
+        <label class="label" for="password">Password</label>
+        <input class="input" id="password" name="password" type="password" autocomplete="current-password" required />
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit">Login with Firebase</button>
+      <p class="p" id="fbStatus" style="margin-top:12px;"></p>
+    </form>
+
+    <div class="auth-links">
+      <a href="{{ url_for('auth.login_view') }}">Back to demo login</a>
+      <a href="{{ url_for('public.home') }}">Home</a>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyDRrsB7RK1pReyo5NvPr58nxL6J7Jqh5JY",
+  authDomain: "gym-madalina.firebaseapp.com",
+  projectId: "gym-madalina",
+  storageBucket: "gym-madalina.firebasestorage.app",
+  messagingSenderId: "675930675886",
+  appId: "1:675930675886:web:490398e97420c7d9fc2b3f",
+  measurementId: "G-BP9C5QRVG6"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const form = document.getElementById("fbLoginForm");
+  const statusEl = document.getElementById("fbStatus");
+
+  function setStatus(msg, isError=false) {
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "rgba(255,120,120,.95)" : "rgba(170,200,255,.95)";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setStatus("Signing in...");
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await cred.user.getIdToken();
+
+      const res = await fetch("/auth/firebase/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken })
+      });
+
+      const data = await res.json();
+      if (!data.ok) {
+        setStatus(data.message || "Login failed.", true);
+        return;
+      }
+
+      setStatus("Login successful. Redirecting...");
+      window.location.href = data.user?.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard";
+    } catch (err) {
+      setStatus(err?.message || "Login failed.", true);
+    }
+  });
+</script>
+{% endblock %}

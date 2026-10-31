@@ -1,0 +1,47 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Memberships{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="pricing">
+  <h1 class="h1">Memberships</h1>
+  <p class="p">Choose a plan. Upgrade anytime.</p>
+
+  <div class="spacer"></div>
+
+  <div class="grid grid-3">
+    {% for p in plans %}
+      <div class="card card-pad plan">
+        <div class="plan-header">
+          <div>
+            <h3 class="h2">{{ p.name }}</h3>
+            <div class="muted">{{ p.duration_days }} days</div>
+          </div>
+          <div class="price">${{ p.price }}</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <ul class="ul">
+          {% for f in p.features %}
+            <li>{{ f }}</li>
+          {% endfor %}
+        </ul>
+
+        <div class="spacer"></div>
+
+        {% if session.get("user") %}
+          <a class="btn btn-primary btn-block" href="{{ url_for('user.checkout', plan=p.id) }}">Choose {{ p.name }}</a>
+        {% else %}
+          <a class="btn btn-primary btn-block" href="{{ url_for('auth.login_view') }}">Login to purchase</a>
+          <a class="btn btn-ghost btn-block" href="{{ url_for('auth.register_view') }}">Create account</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

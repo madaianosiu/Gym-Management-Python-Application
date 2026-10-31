@@ -1,0 +1,58 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Receipt{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .receipt-card {
+    padding:24px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(16,24,56,.96), rgba(8,12,29,.98));
+    display:grid;
+    gap:16px;
+  }
+  .receipt-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .receipt-box {
+    padding:16px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.04);
+  }
+  .receipt-box small { display:block; color:var(--muted); margin-bottom:6px; text-transform:uppercase; font-weight:900; font-size:11px; }
+  .receipt-box strong { color:#fff; overflow-wrap:anywhere; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set title = payment.plan_name or payment.item_name or ("Cart checkout" if payment.item_type == "cart" else "Payment") %}
+<section class="user-head">
+  <div>
+    <h1 class="h1">Receipt</h1>
+    <p class="p">{{ title }}</p>
+  </div>
+  <div class="user-actions">
+    <a class="btn btn-ghost" href="{{ url_for('user.payment_history') }}">Payment history</a>
+    <a class="btn btn-primary" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<section class="receipt-card">
+  <div class="receipt-grid">
+    <div class="receipt-box"><small>Payment ID</small><strong>{{ payment.id }}</strong></div>
+    <div class="receipt-box"><small>Status</small><strong>{{ payment.status }}</strong></div>
+    <div class="receipt-box"><small>Total</small><strong>{{ payment.currency or "USD" }} {{ payment.amount }}</strong></div>
+    <div class="receipt-box"><small>Paid on</small><strong>{{ payment.created_at[:10] if payment.created_at else "Date unavailable" }}</strong></div>
+    <div class="receipt-box"><small>Card</small><strong>**** {{ payment.card_last4 if payment.card_last4 else "--" }}</strong></div>
+    <div class="receipt-box"><small>Provider</small><strong>{{ payment.provider or "demo-card" }}</strong></div>
+  </div>
+  <p class="p">This receipt is stored in Firebase and linked to your user account.</p>
+</section>
+{% endblock %}

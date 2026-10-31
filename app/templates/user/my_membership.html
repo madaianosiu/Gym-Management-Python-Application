@@ -1,0 +1,85 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | My Membership{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .membership-shell { display:grid; gap:18px; }
+  .membership-card {
+    padding:24px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(16,24,56,.96), rgba(8,12,29,.98));
+  }
+  .membership-grid {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+  }
+  .membership-box {
+    padding:16px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.04);
+  }
+  .membership-box small {
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:6px;
+  }
+  .membership-box strong { color:#fff; overflow-wrap:anywhere; }
+  .membership-days {
+    font-size:clamp(48px, 10vw, 96px);
+    line-height:1;
+    color:#fff;
+    margin:8px 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="membership-shell">
+  <section class="user-head">
+    <div>
+      <h1 class="h1">My Membership</h1>
+      <p class="p">Your active plan, renewal date, and access details in one place.</p>
+    </div>
+    <div class="user-actions">
+      <a class="btn btn-ghost" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+      <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">Change plan</a>
+    </div>
+  </section>
+
+  {% if membership %}
+    <article class="membership-card">
+      <div class="muted">Days remaining</div>
+      <div class="membership-days">{{ days_remaining if days_remaining is not none else "--" }}</div>
+      <h2 class="h2">{{ membership.plan_name }} membership</h2>
+      <p class="p">{{ membership.description or membership.ideal_for }}</p>
+    </article>
+
+    <section class="membership-grid">
+      <div class="membership-box"><small>Status</small><strong>{{ membership.status }}</strong></div>
+      <div class="membership-box"><small>Renewal date</small><strong>{{ membership.end_date[:10] if membership.end_date else "Not available" }}</strong></div>
+      <div class="membership-box"><small>Access</small><strong>{{ membership.access_level }}</strong></div>
+      <div class="membership-box"><small>Classes</small><strong>{{ membership.class_access }}</strong></div>
+      <div class="membership-box"><small>Coach</small><strong>{{ membership.coach_support }}</strong></div>
+      <div class="membership-box"><small>Recovery</small><strong>{{ membership.recovery_access }}</strong></div>
+      <div class="membership-box"><small>Guest passes</small><strong>{{ membership.guest_passes }}</strong></div>
+      <div class="membership-box"><small>Payment</small><strong>{{ membership.payment_id }}</strong></div>
+    </section>
+  {% else %}
+    <article class="membership-card">
+      <h2 class="h2">No active membership yet</h2>
+      <p class="p">Choose a membership and complete checkout to see your plan details here.</p>
+      <div class="spacer"></div>
+      <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">Browse memberships</a>
+    </article>
+  {% endif %}
+</section>
+{% endblock %}

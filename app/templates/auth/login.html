@@ -1,0 +1,210 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Login{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <section class="auth-login-shell">
+    <article class="auth-showcase">
+      <div>
+        <div class="auth-kicker">Member access</div>
+        <div class="auth-head">
+          <h1 class="h1">Welcome back.</h1>
+          <p class="p">
+            Your training flow should feel smooth from the first click. Sign in, head to your dashboard, and continue with memberships, store products, and everything already connected to your account.
+          </p>
+        </div>
+
+        <div class="auth-benefits">
+          <div>Fast route to your dashboard, profile, and membership status.</div>
+          <div>Clean member flow after login, without bouncing back into guest pages.</div>
+          <div>Store, cart, checkout, and dashboard all tied into one experience.</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="auth-panel">
+      <div class="auth-panel-top">
+        <div class="mascot-wrap">
+          <div class="mascot-stage">
+            <div class="mascot" id="loginMascot" data-state="idle">
+              <div class="mascot-weight left"></div>
+              <div class="mascot-bar"></div>
+              <div class="mascot-weight right"></div>
+              <div class="mascot-face">
+                <div class="mascot-eye left" id="leftEye"></div>
+                <div class="mascot-eye right" id="rightEye"></div>
+                <div class="mascot-mouth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-head">
+        <div class="auth-kicker">Login</div>
+        <h2 class="h1">Login</h2>
+        <p class="p">Use your email and password to continue your member session.</p>
+      </div>
+
+      <form class="form" id="loginForm">
+        <div>
+          <label class="label" for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+
+        <div>
+          <label class="label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Login</button>
+        <p class="auth-status is-info" id="loginStatus">Enter your email and password to continue.</p>
+      </form>
+
+      <div class="auth-links">
+        <a href="{{ url_for('auth.forgot_view') }}">Forgot password?</a>
+        <a href="{{ url_for('auth.register_view') }}">Create account</a>
+      </div>
+    </article>
+  </section>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDRrsB7RK1pReyo5NvPr58nxL6J7Jqh5JY",
+    authDomain: "gym-madalina.firebaseapp.com",
+    projectId: "gym-madalina",
+    storageBucket: "gym-madalina.firebasestorage.app",
+    messagingSenderId: "675930675886",
+    appId: "1:675930675886:web:490398e97420c7d9fc2b3f",
+    measurementId: "G-BP9C5QRVG6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const form = document.getElementById("loginForm");
+  const statusEl = document.getElementById("loginStatus");
+  const mascot = document.getElementById("loginMascot");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const leftEye = document.getElementById("leftEye");
+  const rightEye = document.getElementById("rightEye");
+
+  function setMascotState(state) {
+    mascot.dataset.state = state;
+  }
+
+  function setStatus(msg, tone = "info") {
+    statusEl.textContent = msg;
+    statusEl.className = `auth-status is-${tone}`;
+  }
+
+  function friendlyLoginMessage(err) {
+    const code = err?.code || "";
+
+    if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found" || code === "auth/invalid-login-credentials") {
+      return "We couldn't match that email and password. Please check your details and try again.";
+    }
+
+    if (code === "auth/too-many-requests") {
+      return "You've tried too many times in a short period. Please wait a moment and try again.";
+    }
+
+    if (code === "auth/network-request-failed") {
+      return "Your connection dropped just now. Check your internet and try again.";
+    }
+
+    if (code === "auth/invalid-email") {
+      return "That email address doesn't look right. Please check it and try again.";
+    }
+
+    return "Login didn't work this time. Please try again.";
+  }
+
+  function moveEyes(target) {
+    const targetRect = target.getBoundingClientRect();
+    const centerX = targetRect.left + targetRect.width / 2;
+    const centerY = targetRect.top + targetRect.height / 2;
+
+    [leftEye, rightEye].forEach((eye) => {
+      const eyeRect = eye.getBoundingClientRect();
+      const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+      const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+      const dx = Math.max(-5, Math.min(5, (centerX - eyeCenterX) / 12));
+      const dy = Math.max(-4, Math.min(4, (centerY - eyeCenterY) / 14));
+      eye.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+  }
+
+  function resetEyes() {
+    [leftEye, rightEye].forEach((eye) => {
+      eye.style.transform = "translate(0px, 0px)";
+    });
+  }
+
+  [emailInput, passwordInput].forEach((input) => {
+    input.addEventListener("focus", () => {
+      setMascotState("typing");
+      moveEyes(input);
+    });
+
+    input.addEventListener("input", () => {
+      setMascotState("typing");
+      moveEyes(input);
+    });
+
+    input.addEventListener("blur", () => {
+      setMascotState("idle");
+      resetEyes();
+    });
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setStatus("Signing you in now...", "info");
+    setMascotState("typing");
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await cred.user.getIdToken();
+
+      const res = await fetch("/auth/firebase/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken })
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        setMascotState("error");
+        setStatus(data.message || "Login failed.", "error");
+        return;
+      }
+
+      setMascotState("success");
+      setStatus("Perfect. We found your account and we're taking you inside now.", "success");
+      window.location.href = data.user?.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard";
+    } catch (err) {
+      console.error("Login error:", err);
+      setMascotState("error");
+      setStatus(friendlyLoginMessage(err), "error");
+    }
+  });
+</script>
+{% endblock %}

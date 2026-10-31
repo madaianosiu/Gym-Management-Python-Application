@@ -1,0 +1,96 @@
+{% extends "shared/base.html" %}
+{% block title %}GYM+ | Admin Payments{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <section class="admin-hero">
+    <div class="admin-kicker">Payments</div>
+    <h1>All payment activity</h1>
+    <p>Review customer payments, totals, cards, and status from Firestore.</p>
+  </section>
+
+  <section class="admin-card admin-table-shell">
+    <div class="admin-table-toolbar">
+      <div>
+        <div class="admin-note">Payment ledger</div>
+        <h2 class="admin-table-title">Customer payment activity</h2>
+        <p class="admin-table-subtitle">
+          Every payment is aligned by item, status, amount, and saved card details for faster admin review.
+        </p>
+      </div>
+      <div class="admin-table-count">
+        <span>Total payments</span>
+        <strong>{{ payments|length }}</strong>
+      </div>
+    </div>
+
+    {% if payments %}
+    <div class="admin-table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Payment ID</th>
+            <th>Customer</th>
+            <th>Item</th>
+            <th>Status</th>
+            <th class="is-right">Total</th>
+            <th>Card</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+          {% set title = payment.plan_name or payment.item_name or ("Cart checkout" if payment.item_type == "cart" else
+          "Payment") %}
+          {% set status = payment.status or "UNKNOWN" %}
+          <tr>
+            <td class="admin-cell-index">{{ loop.index }}</td>
+            <td>
+              <div class="admin-cell-stack">
+                <span class="admin-cell-main is-mono">PAY-{{ "%04d"|format(loop.index) }}</span>
+                <span class="admin-cell-sub">{{ payment.created_at[:10] if payment.created_at else "No date" }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="admin-cell-stack">
+                <span class="admin-cell-main">{{ payment.cardholder_name or "Unknown" }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="admin-cell-stack">
+                <span class="admin-cell-main">{{ title }}</span>
+                <span class="admin-cell-sub">{{ payment.item_type or "membership" }}</span>
+              </div>
+            </td>
+            <td class="is-nowrap">
+              <span
+                class="admin-badge {{ 'is-success' if status == 'SUCCESS' else ('is-danger' if status == 'FAILED' else 'is-warning') }}">
+                {{ status }}
+              </span>
+            </td>
+            <td class="is-right">
+              <div class="admin-cell-stack">
+                <span class="admin-number">{{ payment.currency or "USD" }} {{ payment.amount }}</span>
+                <span class="admin-cell-sub">{{ payment.cardholder_name or "—" }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="admin-cell-stack">
+                <span class="admin-cell-main is-mono">**** {{ payment.card_last4 or "--" }}</span>
+                <span class="admin-cell-sub">{{ payment.provider or "—" }}</span>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">No payments recorded yet.</div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

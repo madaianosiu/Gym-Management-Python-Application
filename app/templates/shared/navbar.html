@@ -1,0 +1,37 @@
+<nav class="nav">
+  <div class="nav-inner container">
+    <a class="brand" href="{{ url_for('admin.dashboard') if session.get('user', {}).get('role') == 'ADMIN' else url_for('user.dashboard') }}">GYM<span class="brand-accent">+</span></a>
+
+    <div class="nav-links">
+      {% if session.get('user', {}).get('role') == 'ADMIN' %}
+        <a href="{{ url_for('admin.dashboard') }}">Overview</a>
+        <a href="{{ url_for('admin.customers') }}">Customers</a>
+        <a href="{{ url_for('admin.payments') }}">Payments</a>
+        <a href="{{ url_for('admin.bookings') }}">Bookings</a>
+        <a href="{{ url_for('admin.messages') }}">Messages</a>
+        <a href="{{ url_for('admin.store') }}">Store</a>
+      {% else %}
+        <a href="{{ url_for('user.memberships') if session.get('user') else url_for('public.pricing') }}">Memberships</a>
+        {% if session.get("user") %}
+          <a href="{{ url_for('user.my_membership') }}">My Membership</a>
+          <a href="{{ url_for('user.classes') }}">Classes</a>
+          <a href="{{ url_for('user.my_bookings') }}">Bookings</a>
+        {% endif %}
+        <a href="{{ url_for('public.store') }}">Store</a>
+        <a href="{{ url_for('public.about') }}">About</a>
+        <a href="{{ url_for('public.contact') }}">Contact</a>
+      {% endif %}
+    </div>
+
+    <div class="nav-actions">
+      {% if session.get("user") %}
+        <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') if session.get('user', {}).get('role') == 'ADMIN' else url_for('user.dashboard') }}">Dashboard</a>
+        <a class="btn btn-primary" href="{{ url_for('auth.logout') }}">Logout</a>
+      {% else %}
+        <a class="btn btn-ghost" href="{{ url_for('auth.login_view') }}">Login</a>
+        <a class="btn btn-ghost" href="{{ url_for('auth.firebase_login_view') }}">Firebase Login</a>
+        <a class="btn btn-primary" href="{{ url_for('auth.register_view') }}">Sign up</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>

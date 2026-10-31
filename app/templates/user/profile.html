@@ -1,0 +1,90 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Profile{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="user-head">
+  <div>
+    <h1 class="h1">Profile</h1>
+    <p class="p">Your personal details are saved to Firestore.</p>
+  </div>
+  <div class="user-actions">
+    <a class="btn btn-ghost" href="{{ url_for('user.dashboard') }}">Back</a>
+    <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">Memberships</a>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<div class="card card-pad">
+  <form class="form" method="post" action="{{ url_for('user.profile_save') }}">
+    <div class="grid grid-2">
+      <div>
+        <label class="label" for="full_name">Full name</label>
+        <input class="input" id="full_name" name="full_name" type="text" value="{{ (profile.full_name if profile else '') | e }}" />
+      </div>
+
+      <div>
+        <label class="label" for="phone">Phone</label>
+        <input class="input" id="phone" name="phone" type="text" value="{{ (profile.phone if profile else '') | e }}" />
+      </div>
+    </div>
+
+    <div>
+      <label class="label" for="address_line1">Address line 1</label>
+      <input class="input" id="address_line1" name="address_line1" type="text" value="{{ (profile.address_line1 if profile else '') | e }}" />
+    </div>
+
+    <div>
+      <label class="label" for="address_line2">Address line 2</label>
+      <input class="input" id="address_line2" name="address_line2" type="text" value="{{ (profile.address_line2 if profile else '') | e }}" />
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <label class="label" for="city">City</label>
+        <input class="input" id="city" name="city" type="text" value="{{ (profile.city if profile else '') | e }}" />
+      </div>
+
+      <div>
+        <label class="label" for="state">State / Region</label>
+        <input class="input" id="state" name="state" type="text" value="{{ (profile.state if profile else '') | e }}" />
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <label class="label" for="zip">ZIP / Postal code</label>
+        <input class="input" id="zip" name="zip" type="text" value="{{ (profile.zip if profile else '') | e }}" />
+      </div>
+
+      <div>
+        <label class="label" for="country">Country</label>
+        <input class="input" id="country" name="country" type="text" value="{{ (profile.country if profile else '') | e }}" />
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <label class="label" for="fitness_level">Fitness level</label>
+        <select class="input" id="fitness_level" name="fitness_level">
+          {% for option in ["Beginner", "Intermediate", "Advanced"] %}
+            <option value="{{ option }}" {% if profile and profile.fitness_level == option %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label class="label" for="fitness_goal">Fitness goal</label>
+        <input class="input" id="fitness_goal" name="fitness_goal" type="text" placeholder="Weight loss, muscle gain, strength..." value="{{ (profile.fitness_goal if profile else '') | e }}" />
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" type="submit">Save profile</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Sign up{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-head">
+    <h1 class="h1">Create your account</h1>
+    <p class="p">Start your training journey today.</p>
+  </div>
+
+  <div class="card card-pad">
+    <form class="form" id="registerForm">
+      <div>
+        <label class="label" for="full_name">Full name</label>
+        <input class="input" id="full_name" name="full_name" type="text" autocomplete="name" required />
+      </div>
+
+      <div>
+        <label class="label" for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" autocomplete="email" required />
+      </div>
+
+      <div>
+        <label class="label" for="password">Password</label>
+        <input class="input" id="password" name="password" type="password" autocomplete="new-password" minlength="8" required />
+        <p class="auth-help">Use at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.</p>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit">Sign up</button>
+      <p class="p" id="registerStatus" style="margin-top:12px;"></p>
+    </form>
+
+    <div class="auth-links">
+      <a href="{{ url_for('auth.login_view') }}">Already have an account?</a>
+      <a href="{{ url_for('public.pricing') }}">View memberships</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDRrsB7RK1pReyo5NvPr58nxL6J7Jqh5JY",
+    authDomain: "gym-madalina.firebaseapp.com",
+    projectId: "gym-madalina",
+    storageBucket: "gym-madalina.firebasestorage.app",
+    messagingSenderId: "675930675886",
+    appId: "1:675930675886:web:490398e97420c7d9fc2b3f",
+    measurementId: "G-BP9C5QRVG6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const form = document.getElementById("registerForm");
+  const statusEl = document.getElementById("registerStatus");
+
+  function setStatus(msg, isError = false) {
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "rgba(255,120,120,.95)" : "rgba(170,200,255,.95)";
+  }
+
+  function validatePassword(password) {
+    if (password.length < 8) return "Password must be at least 8 characters.";
+    if (!/[A-Z]/.test(password)) return "Password must include at least one uppercase letter.";
+    if (!/[a-z]/.test(password)) return "Password must include at least one lowercase letter.";
+    if (!/[0-9]/.test(password)) return "Password must include at least one number.";
+    if (!/[^A-Za-z0-9]/.test(password)) return "Password must include at least one special character.";
+    return "";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setStatus("Creating account...");
+
+    const fullName = document.getElementById("full_name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      if (email.toLowerCase().includes("admin")) {
+        setStatus("Admin accounts cannot be created from customer registration.", true);
+        return;
+      }
+
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        setStatus(passwordError, true);
+        return;
+      }
+
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      if (fullName) {
+        await updateProfile(cred.user, { displayName: fullName });
+      }
+
+      const idToken = await cred.user.getIdToken();
+
+      const res = await fetch("/auth/firebase/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken })
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        setStatus(data.message || "Account created, but login failed.", true);
+        return;
+      }
+
+      setStatus("Account created successfully. Redirecting...");
+      window.location.href = "/user/dashboard";
+    } catch (err) {
+      console.error("Register error:", err);
+      setStatus(err?.message || "Registration failed.", true);
+    }
+  });
+</script>
+{% endblock %}

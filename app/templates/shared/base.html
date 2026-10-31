@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}GYM{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}" />
+    {% block page_css %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}" />
+  </head>
+
+  <body>
+    {% include "shared/navbar.html" %}
+    {% include "shared/side_menu.html" %}
+
+    <main class="container">
+      <div class="page-tools">
+        <button class="back-button" type="button" data-back-button>
+          <span aria-hidden="true">←</span>
+          <strong>Back</strong>
+        </button>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category|e }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    {% include "shared/footer.html" %}
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block page_js %}{% endblock %}
+  </body>
+</html>

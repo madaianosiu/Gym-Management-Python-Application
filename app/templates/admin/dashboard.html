@@ -1,0 +1,115 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Admin{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+<style>
+  .admin-card h2 {
+    margin-bottom: 16px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-shell">
+  <section class="admin-hero">
+    <div class="admin-kicker">Admin control room</div>
+    <h1 class="admin-title">Business overview for GYM+.</h1>
+    <p class="admin-lead">
+      Track memberships, orders, customer messages, revenue flow, and product performance in one matte-black admin dashboard with green signal accents.
+    </p>
+  </section>
+
+  <section class="admin-stats">
+    <div class="admin-stat">
+      <small>Members</small>
+      <strong>{{ admin_data.stats.members }}</strong>
+    </div>
+    <div class="admin-stat">
+      <small>Active memberships</small>
+      <strong>{{ admin_data.stats.active_memberships }}</strong>
+    </div>
+    <div class="admin-stat">
+      <small>Orders</small>
+      <strong>{{ admin_data.stats.orders }}</strong>
+    </div>
+    <div class="admin-stat">
+      <small>Messages</small>
+      <strong>{{ admin_data.stats.messages }}</strong>
+    </div>
+    <div class="admin-stat">
+      <small>Revenue</small>
+      <strong>${{ admin_data.stats.revenue }}</strong>
+    </div>
+  </section>
+
+  <section class="admin-grid">
+    <article class="admin-card">
+      <h2>Membership types</h2>
+      {% if admin_data.plan_rows %}
+        {% for row in admin_data.plan_rows %}
+          <div class="admin-row">
+            <strong>{{ row.name }}</strong>
+            <div class="admin-meta">
+              <span>{{ row.count }} active memberships</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="admin-empty">No membership data yet.</div>
+      {% endif %}
+    </article>
+
+    <article class="admin-card">
+      <h2>Products sold</h2>
+      {% if admin_data.product_rows %}
+        {% for row in admin_data.product_rows %}
+          <div class="admin-row">
+            <strong>{{ row.name }}</strong>
+            <div class="admin-meta">
+              <span>{{ row.count }} units sold</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="admin-empty">No product sales yet.</div>
+      {% endif %}
+    </article>
+
+    <article class="admin-card">
+      <h2>Recent orders</h2>
+      {% if admin_data.recent_orders %}
+        {% for order in admin_data.recent_orders %}
+          <div class="admin-row">
+            <strong>{{ order.product_name or (order.item_count ~ " items") }}</strong>
+            <div class="admin-meta">
+              <span>Status: {{ order.status }}</span>
+              <span>{% if order.total %}Total: ${{ order.total }}{% elif order.price %}Price: ${{ order.price }}{% endif %}</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="admin-empty">No orders recorded yet.</div>
+      {% endif %}
+    </article>
+
+    <article class="admin-card">
+      <h2>Customer messages</h2>
+      {% if admin_data.recent_messages %}
+        {% for message in admin_data.recent_messages %}
+          <div class="admin-row">
+            <strong>{{ message.name }} • {{ message.email }}</strong>
+            <div>{{ message.message }}</div>
+            <div class="admin-meta">
+              <span>Status: {{ message.status }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="admin-empty">No customer messages yet.</div>
+      {% endif %}
+    </article>
+  </section>
+</section>
+{% endblock %}

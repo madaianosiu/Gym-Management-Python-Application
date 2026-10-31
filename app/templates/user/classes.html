@@ -1,0 +1,72 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Classes{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .classes-shell { display:grid; gap:22px; }
+  .classes-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+  .class-card,
+  .booking-card {
+    padding:20px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(16,24,56,.96), rgba(8,12,29,.98));
+  }
+  .class-card h2 { margin:10px 0; color:#fff; }
+  .class-meta { display:grid; gap:8px; color:var(--muted); margin:14px 0; }
+  .booking-list { display:grid; gap:10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="classes-shell">
+  <section class="user-head">
+    <div>
+      <h1 class="h1">Classes & Training</h1>
+      <p class="p">Reserve a weekly class and keep your training schedule organized.</p>
+    </div>
+    <div class="user-actions">
+      <a class="btn btn-ghost" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+      <a class="btn btn-ghost" href="{{ url_for('user.my_bookings') }}">My Bookings</a>
+      <a class="btn btn-primary" href="{{ url_for('user.my_membership') }}">My Membership</a>
+    </div>
+  </section>
+
+  <section class="classes-grid">
+    {% for class_item in classes %}
+      <article class="class-card">
+        <div class="pill">{{ class_item.level }}</div>
+        <h2>{{ class_item.name }}</h2>
+        <div class="class-meta">
+          <span>{{ class_item.day }} at {{ class_item.time }}</span>
+          <span>{{ class_item.duration }} with {{ class_item.coach }}</span>
+          <span>{{ class_item.spots }} spots available</span>
+        </div>
+        <form method="post" action="{{ url_for('user.class_book', class_id=class_item.id) }}">
+          <button class="btn btn-primary btn-block" type="submit">Book class</button>
+        </form>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="booking-card">
+    <h2 class="h2">Your bookings</h2>
+    {% if bookings %}
+      <div class="booking-list">
+        {% for booking in bookings %}
+          <div class="class-meta">
+            <strong>{{ booking.class_name }}</strong>
+            <span>{{ booking.day }} at {{ booking.time }} - {{ booking.status }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="p">No bookings yet. Pick a class above to reserve your spot.</p>
+    {% endif %}
+    <div class="spacer"></div>
+    <a class="btn btn-ghost" href="{{ url_for('user.my_bookings') }}">Open My Bookings</a>
+  </section>
+</section>
+{% endblock %}

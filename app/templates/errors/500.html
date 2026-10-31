@@ -1,0 +1,12 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Server error{% endblock %}
+
+{% block content %}
+<div class="card card-pad">
+  <h1 class="h1">500</h1>
+  <p class="p">Something went wrong on our side. Please try again.</p>
+  <div class="spacer"></div>
+  <a class="btn btn-primary" href="{{ url_for('public.home') }}">Back to home</a>
+</div>
+{% endblock %}

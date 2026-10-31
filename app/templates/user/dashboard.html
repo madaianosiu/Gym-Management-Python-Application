@@ -1,0 +1,951 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Dashboard{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .dash-shell {
+    display: grid;
+    gap: 26px;
+  }
+
+  .dash-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 34px;
+    border-radius: 34px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(74, 116, 255, 0.28), transparent 24%),
+      radial-gradient(circle at bottom left, rgba(32, 214, 183, 0.12), transparent 22%),
+      linear-gradient(145deg, rgba(19, 27, 61, 0.98), rgba(8, 13, 32, 0.98));
+    box-shadow:
+      0 28px 70px rgba(0,0,0,0.26),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .dash-hero::after {
+    content: "";
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(94, 129, 255, 0.28), rgba(94, 129, 255, 0));
+    pointer-events: none;
+  }
+
+  .dash-hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+    align-items: end;
+  }
+
+  .dash-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 154, 255, 0.24);
+    background: rgba(24, 36, 84, 0.5);
+    color: #ccd8ff;
+    font-size: 13px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .dash-title {
+    margin: 0 0 14px;
+    font-size: clamp(48px, 7vw, 82px);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    color: #f2f6ff;
+  }
+
+  .dash-lead {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(224, 232, 255, 0.82);
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  .dash-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+
+  .ai-spotlight {
+    width: min(100%, 720px);
+    margin-top: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    color: #07111f;
+    cursor: pointer;
+    text-align: left;
+    background:
+      linear-gradient(135deg, #9cff6a, #26f0d0 46%, #ffec5c);
+    box-shadow:
+      0 20px 44px rgba(38, 240, 208, 0.18),
+      0 0 0 1px rgba(255,255,255,0.16);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .ai-spotlight:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 28px 58px rgba(38, 240, 208, 0.24),
+      0 0 0 1px rgba(255,255,255,0.2);
+  }
+
+  .ai-spotlight-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 18px;
+  }
+
+  .ai-spotlight-kicker {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(7, 17, 31, 0.7);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .ai-spotlight-title {
+    display: block;
+    color: #07111f;
+    font-size: 28px;
+    font-weight: 950;
+    line-height: 1.05;
+  }
+
+  .ai-spotlight-copy {
+    display: block;
+    margin-top: 8px;
+    color: rgba(7, 17, 31, 0.78);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
+  .ai-spotlight-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 148px;
+    min-height: 58px;
+    padding: 0 22px;
+    border-radius: 8px;
+    background: #07111f;
+    color: #f7fbff;
+    font-weight: 950;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  .dash-status-panel {
+    padding: 22px;
+    border-radius: 26px;
+    background: rgba(7, 12, 31, 0.58);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .dash-status-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .dash-status-top strong {
+    display: block;
+    color: #fff;
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .dash-status-top span {
+    color: rgba(210, 220, 255, 0.72);
+    font-size: 14px;
+  }
+
+  .dash-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(66, 102, 247, 0.18);
+    border: 1px solid rgba(118, 149, 255, 0.26);
+    color: #edf2ff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .dash-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dash-mini-card {
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .dash-mini-card small {
+    display: block;
+    color: rgba(204, 214, 255, 0.62);
+    margin-bottom: 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .dash-mini-card strong {
+    color: #fff;
+    font-size: 20px;
+  }
+
+  .dash-overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .dash-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 310px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(51, 240, 193, 0.12), transparent 28%),
+      linear-gradient(180deg, rgba(17, 25, 59, 0.98), rgba(8, 12, 29, 0.99));
+    box-shadow:
+      0 18px 50px rgba(0,0,0,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .dash-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(108, 141, 255, 0.28);
+    box-shadow:
+      0 26px 60px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .dash-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, #2f6bff, #26f0d0, #ffec5c);
+    opacity: 0.82;
+  }
+
+  .dash-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dash-card h3 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 28px;
+  }
+
+  .dash-card-label {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 16px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 154, 255, 0.25);
+    background: rgba(67, 102, 247, 0.14);
+    color: #dbe5ff;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .dash-card p {
+    margin: 0;
+    color: rgba(224, 231, 255, 0.78);
+    line-height: 1.75;
+  }
+
+  .dash-link-block {
+    margin-top: auto;
+    padding-top: 22px;
+  }
+
+  .dash-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  .dash-feature-list li {
+    color: rgba(231, 237, 255, 0.82);
+  }
+
+  .dash-feature-list strong {
+    color: #fff;
+  }
+
+  .dash-card-highlight {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: rgba(231, 237, 255, 0.84);
+    line-height: 1.6;
+  }
+
+  .dash-store {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 22px;
+  }
+
+  .dash-store-visual {
+    min-height: 260px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.05), transparent 30%),
+      url("{{ url_for('static', filename='img/store-shirt.svg') }}") center/cover no-repeat,
+      linear-gradient(160deg, #152152, #080e24);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+  }
+
+  .dash-store-copy {
+    padding: 30px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(72, 115, 255, 0.24), transparent 24%),
+      linear-gradient(180deg, rgba(15, 23, 52, 0.97), rgba(8, 12, 30, 0.98));
+  }
+
+  .dash-store-copy h2 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 40px;
+    line-height: 1.02;
+  }
+
+  .dash-store-copy p {
+    margin: 0;
+    color: rgba(224, 231, 255, 0.8);
+    line-height: 1.8;
+    max-width: 580px;
+  }
+
+  .dash-store-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+
+  .notification-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .notification-card {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .notification-card strong {
+    display: block;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .notification-card p {
+    margin: 0 0 12px;
+    color: rgba(224, 231, 255, 0.78);
+    line-height: 1.55;
+  }
+
+  .saved-plan-card {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: rgba(231,237,255,0.86);
+    white-space: pre-line;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .ai-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 60;
+    width: min(430px, 100vw);
+    height: 100vh;
+    padding: 18px;
+    transform: translateX(102%);
+    transition: transform 220ms ease;
+    pointer-events: none;
+  }
+
+  .ai-drawer.is-open {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .ai-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(3, 6, 18, 0.58);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+
+  .ai-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ai-panel {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: 14px;
+    padding: 22px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(66, 107, 255, 0.2), transparent 24%),
+      linear-gradient(180deg, rgba(13, 20, 46, 0.98), rgba(7, 11, 27, 0.99));
+    box-shadow: 0 28px 70px rgba(0,0,0,0.34);
+  }
+
+  .ai-panel-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .ai-kicker {
+    display: inline-flex;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 154, 255, 0.24);
+    background: rgba(24, 36, 84, 0.44);
+    color: #d8e2ff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .ai-panel h3 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 30px;
+  }
+
+  .ai-panel p {
+    margin: 0;
+    color: rgba(224, 231, 255, 0.76);
+    line-height: 1.7;
+  }
+
+  .ai-close {
+    border: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    font-size: 22px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .ai-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ai-chip {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #f0f4ff;
+    border-radius: 999px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .ai-messages {
+    overflow: auto;
+    display: grid;
+    gap: 12px;
+    padding-right: 6px;
+  }
+
+  .ai-message {
+    padding: 14px 16px;
+    border-radius: 18px;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+
+  .ai-message.user {
+    margin-left: 40px;
+    background: rgba(55, 94, 255, 0.16);
+    border: 1px solid rgba(93, 127, 255, 0.22);
+    color: #eff3ff;
+  }
+
+  .ai-message.bot {
+    margin-right: 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(231, 237, 255, 0.86);
+  }
+
+  .ai-profile-strip {
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: rgba(223, 230, 255, 0.82);
+    font-size: 14px;
+  }
+
+  .ai-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+  }
+
+  .ai-input {
+    width: 100%;
+    min-height: 54px;
+    max-height: 130px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    resize: vertical;
+    font: inherit;
+  }
+
+  @media (max-width: 1100px) {
+    .dash-hero-grid,
+    .dash-overview,
+    .dash-store,
+    .notification-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .dash-hero,
+    .dash-card,
+    .dash-store-copy {
+      padding: 22px;
+    }
+
+    .dash-mini-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dash-title {
+      font-size: 46px;
+    }
+
+    .ai-spotlight-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-spotlight-title {
+      font-size: 24px;
+    }
+
+    .ai-spotlight-action {
+      width: 100%;
+    }
+
+    .ai-form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="dash-shell">
+  <section class="dash-hero">
+    <div class="dash-hero-grid">
+      <div>
+        <div class="dash-kicker">Member dashboard - GYM+</div>
+        <h1 class="dash-title">Train with a plan. Progress with clarity.</h1>
+        <p class="dash-lead">
+          {% if user and user.full_name %}
+            Welcome back, {{ user.full_name }}. This is your command center for memberships, upgrades, profile details, and everything that keeps your training momentum high.
+          {% else %}
+            This is your command center for memberships, profile details, and next steps inside GYM+.
+          {% endif %}
+        </p>
+
+        <button class="ai-spotlight" type="button" data-ai-open>
+          <span class="ai-spotlight-inner">
+            <span>
+              <span class="ai-spotlight-kicker">AI Coach ready</span>
+              <span class="ai-spotlight-title">Build my next workout and meal plan</span>
+              <span class="ai-spotlight-copy">Tell me your goal, weight, height, and schedule. I will turn it into a practical plan.</span>
+            </span>
+            <span class="ai-spotlight-action">Open Coach</span>
+          </span>
+        </button>
+
+        <div class="dash-actions">
+          <a class="btn btn-primary" href="{{ url_for('user.memberships') }}">
+            {% if membership %}Manage membership{% else %}Browse plans{% endif %}
+          </a>
+          <a class="btn btn-ghost" href="{{ url_for('public.store') }}">Visit store</a>
+          <a class="btn btn-ghost" href="{{ url_for('user.my_bookings') }}">Bookings</a>
+          <a class="btn btn-ghost" href="{{ url_for('user.payment_history') }}">Payment history</a>
+          <a class="btn btn-ghost" href="{{ url_for('user.profile') }}">Profile</a>
+          <a class="btn btn-ghost" href="{{ url_for('public.about') }}">About</a>
+        </div>
+      </div>
+
+      <aside class="dash-status-panel">
+        <div class="dash-status-top">
+          <div>
+            <strong>{{ membership.plan_name if membership else "No active plan" }}</strong>
+            <span>Current membership status</span>
+          </div>
+          <div class="dash-badge">{{ membership.status if membership else "INACTIVE" }}</div>
+        </div>
+
+        <div class="dash-mini-grid">
+          <div class="dash-mini-card">
+            <small>Access level</small>
+            <strong>{% if membership %}{{ membership.access_level }}{% else %}Not set{% endif %}</strong>
+          </div>
+          <div class="dash-mini-card">
+            <small>Classes</small>
+            <strong>{% if membership %}{{ membership.class_access }}{% else %}Not set{% endif %}</strong>
+          </div>
+          <div class="dash-mini-card">
+            <small>Coach support</small>
+            <strong>{% if membership %}{{ membership.coach_support }}{% else %}Pending{% endif %}</strong>
+          </div>
+          <div class="dash-mini-card">
+            <small>Recovery</small>
+            <strong>{% if membership %}{{ membership.recovery_access }}{% else %}Not saved{% endif %}</strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {% if notifications %}
+    <section class="notification-grid">
+      {% for item in notifications %}
+        <article class="notification-card">
+          <strong>{{ item.title }}</strong>
+          <p>{{ item.message }}</p>
+          <a class="btn btn-ghost btn-block" href="{{ item.href }}">{{ item.action }}</a>
+        </article>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <section class="dash-overview">
+    <article class="dash-card">
+      <span class="dash-card-label">Current plan</span>
+      <h3>Membership overview</h3>
+      {% if membership %}
+        <p>
+          Your <strong>{{ membership.plan_name }}</strong> plan is active and saved to your Firebase account.
+        </p>
+        <ul class="dash-feature-list">
+          <li><strong>${{ membership.price }}</strong> plan price</li>
+          <li><strong>{{ membership.duration_days }}</strong> training days covered</li>
+          <li><strong>{{ membership.end_date[:10] if membership.end_date else "Not available" }}</strong> renewal date</li>
+        </ul>
+        <div class="dash-card-highlight">{{ membership.ideal_for }}</div>
+      {% else %}
+        <p>
+          You do not have a saved membership yet. Once you complete checkout, the plan will be attached to your account and shown here every time you log in.
+        </p>
+      {% endif %}
+    </article>
+
+    <article class="dash-card">
+      <span class="dash-card-label">Receipts</span>
+      <h3>Payments</h3>
+      {% if membership %}
+        <p>
+          Memberships, store orders, and cart checkouts stay linked to your account.
+        </p>
+        <div class="dash-card-highlight">Open your history anytime to review what you paid and when.</div>
+        <div class="dash-link-block">
+          <a class="btn btn-primary btn-block" href="{{ url_for('user.payment_history') }}">View payment history</a>
+        </div>
+      {% else %}
+        <p>
+          After your first checkout, your paid memberships and store orders will be listed in your payment history.
+        </p>
+        <div class="dash-link-block">
+          <a class="btn btn-primary btn-block" href="{{ url_for('user.payment_history') }}">Open history</a>
+        </div>
+      {% endif %}
+    </article>
+
+    <article class="dash-card">
+      <span class="dash-card-label">Smart coaching</span>
+      <h3>AI Coach</h3>
+      <p>
+        Get training plans, nutrition ideas, recovery guidance, and follow-up answers that remember your coach profile.
+      </p>
+      {% if membership %}
+        <ul class="dash-feature-list">
+          <li><strong>{{ membership.plan_name }}</strong> membership context</li>
+          <li><strong>{{ membership.access_level }}</strong> access level</li>
+          <li>Meal and training ideas around your plan</li>
+        </ul>
+      {% endif %}
+      <div class="dash-link-block">
+        <button class="btn btn-primary btn-block" type="button" data-ai-open>Open AI Coach</button>
+      </div>
+      {% if saved_ai_plans %}
+        <div class="saved-plan-card">
+          <strong>Latest saved AI plan</strong>
+          <div>{{ saved_ai_plans[0].content }}</div>
+        </div>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="dash-store">
+    <div class="dash-store-visual" aria-hidden="true"></div>
+
+    <div class="dash-store-copy">
+      <h2>Level up your gym essentials too.</h2>
+      <p>
+        The GYM+ Store brings together protein, recovery basics, apparel, and training accessories in one clean flow.
+        If this dashboard is your member hub, the store should feel like the natural next move, not a separate universe.
+      </p>
+
+      <div class="dash-store-actions">
+        <a class="btn btn-primary" href="{{ url_for('public.store') }}">Open store</a>
+        <a class="btn btn-ghost" href="{{ url_for('public.contact') }}">Ask about products</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<div class="ai-overlay" id="aiOverlay"></div>
+<aside class="ai-drawer" id="aiDrawer" aria-hidden="true">
+  <section class="ai-panel">
+    <div class="ai-panel-top">
+      <div>
+        <div class="ai-kicker">AI Coach</div>
+        <h3>Coach me in real time.</h3>
+        <p>Tell me your goal, weight, height, and training schedule. I will turn that into practical guidance.</p>
+      </div>
+      <button class="ai-close" id="aiClose" type="button" aria-label="Close AI Coach">×</button>
+    </div>
+
+    <div class="ai-quick-actions">
+      <button class="ai-chip" type="button" data-ai-prompt="I want weight loss help.">Weight loss</button>
+      <button class="ai-chip" type="button" data-ai-prompt="I want muscle gain help.">Muscle gain</button>
+      <button class="ai-chip" type="button" data-ai-prompt="Give me meal ideas and a protein target.">Meal ideas</button>
+      <button class="ai-chip" type="button" data-ai-prompt="Build me a weekly workout plan.">Weekly plan</button>
+    </div>
+
+    <div class="ai-messages" id="aiMessages">
+      <div class="ai-message bot">
+        I am your GYM+ coach. Try something like:
+        - I want weight loss, I am 82 kg and 176 cm
+        - Give me meal ideas for muscle gain
+        - Build me a weekly workout for 4 days
+      </div>
+    </div>
+
+    <div class="ai-profile-strip" id="aiProfileStrip">
+      Saved coach profile:
+      weight {% if ai_profile.weight_kg %}{{ ai_profile.weight_kg|int }} kg{% else %}not set{% endif %},
+      height {% if ai_profile.height_cm %}{{ ai_profile.height_cm|int }} cm{% else %}not set{% endif %},
+      goal {{ ai_profile.goal or 'not set' }},
+      days {{ ai_profile.training_days or 'not set' }}.
+    </div>
+
+    <form class="ai-form" id="aiForm">
+      <textarea class="ai-input" id="aiInput" placeholder="Tell me your goal, weight, height, training days, or ask for meal ideas..."></textarea>
+      <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+    <button class="btn btn-ghost btn-block" type="button" id="aiSavePlan">Save latest plan</button>
+  </section>
+</aside>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  (() => {
+    const overlay = document.getElementById("aiOverlay");
+    const drawer = document.getElementById("aiDrawer");
+    const closeBtn = document.getElementById("aiClose");
+    const openButtons = document.querySelectorAll("[data-ai-open]");
+    const chips = document.querySelectorAll("[data-ai-prompt]");
+    const form = document.getElementById("aiForm");
+    const input = document.getElementById("aiInput");
+    const messages = document.getElementById("aiMessages");
+    const profileStrip = document.getElementById("aiProfileStrip");
+    const savePlanButton = document.getElementById("aiSavePlan");
+    let latestCoachReply = "";
+
+    if (!overlay || !drawer || !form || !input || !messages || !profileStrip) return;
+
+    const goalLabels = {
+      weight_loss: "weight loss",
+      muscle_gain: "muscle gain",
+      maintenance: "maintenance",
+    };
+
+    function openDrawer() {
+      drawer.classList.add("is-open");
+      overlay.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+      setTimeout(() => input.focus(), 80);
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("is-open");
+      overlay.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    function addMessage(role, text) {
+      const el = document.createElement("div");
+      el.className = `ai-message ${role}`;
+      el.textContent = text;
+      messages.appendChild(el);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function updateProfileStrip(profile) {
+      profileStrip.textContent =
+        `Saved coach profile: weight ${profile.weight_kg ? Math.round(profile.weight_kg) + " kg" : "not set"}, `
+        + `height ${profile.height_cm ? Math.round(profile.height_cm) + " cm" : "not set"}, `
+        + `goal ${goalLabels[profile.goal] || profile.goal || "not set"}, `
+        + `days ${profile.training_days || "not set"}.`;
+    }
+
+    async function sendPrompt(message) {
+      if (!message.trim()) return;
+      addMessage("user", message);
+      input.value = "";
+
+      try {
+        const res = await fetch("{{ url_for('user.ai_coach_chat') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          addMessage("bot", data.message || "I couldn't process that just now.");
+          return;
+        }
+
+        latestCoachReply = data.reply || "I have a starting recommendation for you.";
+        addMessage("bot", latestCoachReply);
+        updateProfileStrip(data.profile || {});
+      } catch (err) {
+        addMessage("bot", "The coach connection dropped for a moment. Please try again.");
+      }
+    }
+
+    openButtons.forEach((button) => button.addEventListener("click", openDrawer));
+    chips.forEach((chip) =>
+      chip.addEventListener("click", () => {
+        openDrawer();
+        sendPrompt(chip.dataset.aiPrompt || "");
+      })
+    );
+
+    overlay.addEventListener("click", closeDrawer);
+    closeBtn?.addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDrawer();
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendPrompt(input.value);
+    });
+
+    savePlanButton?.addEventListener("click", async () => {
+      if (!latestCoachReply.trim()) {
+        addMessage("bot", "Ask me for a plan first, then save it here.");
+        return;
+      }
+
+      try {
+        const res = await fetch("{{ url_for('user.ai_coach_save_plan') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: "Saved AI Coach plan", content: latestCoachReply }),
+        });
+        const data = await res.json();
+        addMessage("bot", data.ok ? "Saved. Your plan is now attached to your profile." : (data.message || "Could not save the plan."));
+      } catch (err) {
+        addMessage("bot", "Could not save the plan right now.");
+      }
+    });
+  })();
+</script>
+{% endblock %}

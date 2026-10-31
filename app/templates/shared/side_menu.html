@@ -1,0 +1,52 @@
+<div class="side-menu-overlay" data-side-overlay></div>
+
+<button class="side-menu-toggle" type="button" data-side-open aria-label="Open menu">
+  <span>Menu</span>
+  <strong>+</strong>
+</button>
+
+<aside class="side-menu" data-side-menu aria-hidden="true">
+  <div class="side-menu-panel">
+    <button class="side-menu-close" type="button" data-side-close>
+      <span>Close</span>
+      <strong>×</strong>
+    </button>
+
+    <nav class="side-menu-links" aria-label="Main menu">
+      {% if session.get('user', {}).get('role') == 'ADMIN' %}
+        <a href="{{ url_for('admin.dashboard') }}">Overview</a>
+        <a href="{{ url_for('admin.customers') }}">Customers</a>
+        <a href="{{ url_for('admin.payments') }}">Payments</a>
+        <a href="{{ url_for('admin.bookings') }}">Bookings</a>
+        <a href="{{ url_for('admin.messages') }}">Messages</a>
+        <a href="{{ url_for('admin.store') }}">Store Manager</a>
+        <a href="{{ url_for('public.contact') }}">Customer Contact</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+      {% elif session.get("user") %}
+        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user.my_membership') }}">My Membership</a>
+        <a href="{{ url_for('user.memberships') }}">Memberships</a>
+        <a href="{{ url_for('user.classes') }}">Classes</a>
+        <a href="{{ url_for('user.my_bookings') }}">My Bookings</a>
+        <a href="{{ url_for('public.store') }}">Store</a>
+        <a href="{{ url_for('user.cart') }}">Cart</a>
+        <a href="{{ url_for('user.payment_history') }}">Payment History</a>
+        <a href="{{ url_for('user.profile') }}">Profile</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('public.home') }}">Home</a>
+        <a href="{{ url_for('public.pricing') }}">Memberships</a>
+        <a href="{{ url_for('public.store') }}">Store</a>
+        <a href="{{ url_for('public.about') }}">About</a>
+        <a href="{{ url_for('public.contact') }}">Contact</a>
+        <a href="{{ url_for('auth.login_view') }}">Login</a>
+      {% endif %}
+    </nav>
+
+    <div class="side-menu-card">
+      <span>GYM+ flow</span>
+      <strong>Train smart. Move fast.</strong>
+      <p>Quick access to the pages you use most.</p>
+    </div>
+  </div>
+</aside>

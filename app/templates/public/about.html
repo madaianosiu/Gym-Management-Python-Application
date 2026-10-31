@@ -1,0 +1,332 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | About{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}" />
+<style>
+  .about-shell {
+    margin-top: 14px;
+    display: grid;
+    gap: 28px;
+  }
+
+  .about-hero {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .about-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 160, 255, 0.2);
+    background: rgba(18, 28, 66, 0.58);
+    color: #c9d6ff;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .about-title {
+    max-width: 760px;
+    margin: 18px 0 14px;
+    font-size: clamp(44px, 6vw, 78px);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+    color: #f3f6ff;
+  }
+
+  .about-lead {
+    max-width: 640px;
+    color: rgba(224, 231, 255, 0.82);
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  .about-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .about-visual {
+    position: relative;
+    min-height: 420px;
+    border-radius: 34px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(73, 118, 255, 0.5), transparent 26%),
+      radial-gradient(circle at bottom left, rgba(32, 227, 178, 0.18), transparent 24%),
+      linear-gradient(160deg, #121b43 0%, #0a112e 48%, #070b1d 100%);
+    box-shadow:
+      0 30px 70px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .about-visual::before {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border-radius: 28px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.08), transparent 28%),
+      url("{{ url_for('static', filename='img/about-energy.svg') }}") center/cover no-repeat;
+    opacity: 0.95;
+  }
+
+  .about-visual-badge {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 22px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    z-index: 1;
+  }
+
+  .about-stat {
+    padding: 16px;
+    border-radius: 20px;
+    background: rgba(8, 14, 36, 0.72);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+  }
+
+  .about-stat strong {
+    display: block;
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .about-stat span {
+    color: rgba(210, 219, 255, 0.72);
+    font-size: 13px;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .about-card {
+    padding: 26px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background:
+      linear-gradient(180deg, rgba(17, 25, 58, 0.96), rgba(8, 13, 34, 0.98));
+    box-shadow:
+      0 18px 45px rgba(0,0,0,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .about-card h3 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  .about-card p {
+    margin: 0;
+    color: rgba(224, 231, 255, 0.8);
+    line-height: 1.75;
+  }
+
+  .about-benefits {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 22px;
+  }
+
+  .about-photo-stack {
+    display: grid;
+    gap: 16px;
+  }
+
+  .about-photo {
+    min-height: 190px;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      linear-gradient(140deg, rgba(255,255,255,0.06), transparent 32%),
+      url("{{ url_for('static', filename='img/about-space.svg') }}") center/cover no-repeat;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+  }
+
+  .about-photo.secondary {
+    min-height: 220px;
+    background:
+      linear-gradient(140deg, rgba(255,255,255,0.06), transparent 32%),
+      url("{{ url_for('static', filename='img/about-recovery.svg') }}") center/cover no-repeat;
+  }
+
+  .benefit-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .benefit-item {
+    padding: 18px 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(229, 235, 255, 0.88);
+  }
+
+  .benefit-item strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  .story-band {
+    padding: 32px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top left, rgba(68, 111, 255, 0.26), transparent 22%),
+      linear-gradient(180deg, rgba(15, 22, 52, 0.96), rgba(8, 12, 30, 0.98));
+  }
+
+  .story-band h2 {
+    margin: 0 0 14px;
+    font-size: 38px;
+    color: #fff;
+  }
+
+  .story-band p {
+    max-width: 860px;
+    margin: 0;
+    color: rgba(224, 231, 255, 0.82);
+    line-height: 1.8;
+    font-size: 18px;
+  }
+
+  @media (max-width: 1100px) {
+    .about-hero,
+    .about-benefits,
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-visual-badge {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="about-shell">
+  <section class="about-hero">
+    <div>
+      <div class="about-kicker">About GYM+ • Stronger every day</div>
+      <h1 class="about-title">A gym built to make people feel powerful, focused, and proud to come back.</h1>
+      <p class="about-lead">
+        GYM+ is more than a room full of equipment. It is a premium training environment designed for energy,
+        confidence, consistency, and visible progress. We built it for people who want a clean space, a serious
+        atmosphere, and a team that actually cares about results.
+      </p>
+
+      <div class="about-actions">
+        <a class="btn btn-primary" href="{{ url_for('public.pricing') if not session.get('user') else url_for('user.memberships') }}">Explore memberships</a>
+        <a class="btn btn-ghost" href="{{ url_for('public.contact') }}">Visit the club</a>
+      </div>
+    </div>
+
+    <div class="about-visual">
+      <div class="about-visual-badge">
+        <div class="about-stat">
+          <strong>24/7</strong>
+          <span>Clean, motivating training atmosphere</span>
+        </div>
+        <div class="about-stat">
+          <strong>Elite</strong>
+          <span>Coaching mindset and member support</span>
+        </div>
+        <div class="about-stat">
+          <strong>Results</strong>
+          <span>Programs, recovery, and consistency</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-grid">
+    <article class="about-card">
+      <h3>Why members love it</h3>
+      <p>
+        The space feels sharp, modern, and energizing from the first minute. Members stay because the club gives
+        them structure, momentum, and a real sense of progress instead of random workouts.
+      </p>
+    </article>
+
+    <article class="about-card">
+      <h3>Premium equipment</h3>
+      <p>
+        From strength zones to conditioning areas, every section is designed to flow well, look clean, and help
+        people train seriously without feeling crowded or chaotic.
+      </p>
+    </article>
+
+    <article class="about-card">
+      <h3>Real support</h3>
+      <p>
+        Whether someone is just starting or pushing for a transformation, GYM+ offers guidance, motivation,
+        and a higher standard of member experience at every step.
+      </p>
+    </article>
+  </section>
+
+  <section class="about-benefits">
+    <div class="about-photo-stack">
+      <div class="about-photo" aria-hidden="true"></div>
+      <div class="about-photo secondary" aria-hidden="true"></div>
+    </div>
+
+    <div class="about-card">
+      <h3>Benefits that matter</h3>
+      <div class="benefit-list">
+        <div class="benefit-item">
+          <strong>Motivating atmosphere</strong>
+          The club is designed to keep energy high and distractions low, so members stay focused and enjoy showing up.
+        </div>
+        <div class="benefit-item">
+          <strong>Smart member experience</strong>
+          Easy access to plans, profile details, and membership management gives people a smooth digital journey too.
+        </div>
+        <div class="benefit-item">
+          <strong>Coaching and recovery mindset</strong>
+          Strong results come from training, recovery, and consistency together, not just from lifting harder.
+        </div>
+        <div class="benefit-item">
+          <strong>For every level</strong>
+          Beginners feel welcomed, intermediate members stay challenged, and advanced members still feel inspired.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="story-band">
+    <h2>More than a membership</h2>
+    <p>
+      GYM+ is the kind of place people join for the equipment, but stay for the feeling. It gives members a strong
+      first impression, a polished experience every visit, and a training environment that feels both ambitious and
+      personal. If someone wants a gym that looks premium, feels organized, and supports long-term progress, this is it.
+    </p>
+  </section>
+</section>
+{% endblock %}

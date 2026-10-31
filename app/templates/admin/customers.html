@@ -1,0 +1,79 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Admin Customers{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <section class="admin-hero">
+    <div class="admin-kicker">Customers</div>
+    <h1>Members, revenue, bookings, and active plans.</h1>
+    <p>Use this view to understand every customer account connected to Firestore.</p>
+  </section>
+
+  <section class="admin-card admin-table-shell">
+    <div class="admin-table-toolbar">
+      <div>
+        <div class="admin-note">Customer registry</div>
+        <h2 class="admin-table-title">Connected customer accounts</h2>
+        <p class="admin-table-subtitle">
+          Revenue, bookings, account roles, and current membership status are grouped into a cleaner admin table.
+        </p>
+      </div>
+      <div class="admin-table-count">
+        <span>Total customers</span>
+        <strong>{{ customers|length }}</strong>
+      </div>
+    </div>
+
+    {% if customers %}
+      <div class="admin-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Role</th>
+              <th>Membership</th>
+              <th class="is-right">Payments</th>
+              <th class="is-right">Revenue</th>
+              <th class="is-right">Bookings</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customers %}
+              {% set membership = customer.membership if customer.membership else {} %}
+              <tr>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ customer.full_name or "No name" }}</span>
+                    <span class="admin-cell-sub">{{ customer.email or "No email" }}</span>
+                  </div>
+                </td>
+                <td class="is-nowrap">
+                  <span class="admin-badge {{ 'is-admin' if (customer.role or 'USER') == 'ADMIN' else '' }}">
+                    {{ customer.role or "USER" }}
+                  </span>
+                </td>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ membership.plan_name or "No active plan" }}</span>
+                    <span class="admin-cell-sub">{{ membership.status or "Not subscribed" }}</span>
+                  </div>
+                </td>
+                <td class="is-right"><span class="admin-number">{{ customer.payments_count }}</span></td>
+                <td class="is-right"><span class="admin-number">${{ customer.revenue }}</span></td>
+                <td class="is-right"><span class="admin-number">{{ customer.bookings_count }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">No customers found yet.</div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

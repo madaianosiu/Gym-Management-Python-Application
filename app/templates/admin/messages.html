@@ -1,0 +1,140 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Admin Messages{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+<style>
+  .admin-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .admin-panel strong {
+    color: #fff;
+    font-size: 30px;
+  }
+
+  .messages-grid {
+    display: grid;
+    gap: 18px;
+  }
+
+  .message-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 12px;
+  }
+
+  .message-badge {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(103, 255, 171, 0.18);
+    background: rgba(14, 48, 30, 0.44);
+    color: #98ffc4;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .message-copy {
+    margin: 0 0 16px;
+  }
+
+  .message-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    font-size: 14px;
+  }
+
+  .message-form {
+    grid-template-columns: 180px 1fr auto;
+    align-items: start;
+  }
+
+  .reply-preview {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(221, 244, 230, 0.88);
+  }
+
+  @media (max-width: 900px) {
+    .message-form {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-panel {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <section class="admin-hero">
+    <div class="admin-kicker">Admin Messages</div>
+    <h1>Inbox for member questions and support follow-up.</h1>
+    <p>
+      Review what customers send from the contact page, update the status, and keep your reply history in one admin-only workspace.
+    </p>
+  </section>
+
+  <section class="admin-panel">
+    <div>
+      <div class="admin-note">Total customer messages</div>
+      <strong>{{ messages|length }}</strong>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Back to overview</a>
+  </section>
+
+  <section class="messages-grid">
+    {% if messages %}
+      {% for message in messages %}
+        <article class="message-card">
+          <div class="message-head">
+            <div>
+              <h2>{{ message.name }}</h2>
+              <div class="message-meta">
+                <span>{{ message.email }}</span>
+                <span>{{ message.created_at or "No date" }}</span>
+              </div>
+            </div>
+            <div class="message-badge">{{ message.status or "NEW" }}</div>
+          </div>
+
+          <p class="message-copy">{{ message.message }}</p>
+
+          <form class="message-form" method="post" action="{{ url_for('admin.message_reply', message_id=message.id) }}">
+            <select name="status">
+              {% for option in ["NEW", "IN_REVIEW", "REPLIED", "CLOSED"] %}
+                <option value="{{ option }}" {% if (message.status or "NEW") == option %}selected{% endif %}>{{ option.replace("_", " ") }}</option>
+              {% endfor %}
+            </select>
+            <textarea name="admin_reply" placeholder="Write your admin reply here...">{{ message.admin_reply or "" }}</textarea>
+            <button class="btn btn-primary" type="submit">Save reply</button>
+          </form>
+
+          {% if message.admin_reply %}
+            <div class="reply-preview">
+              <strong>Saved reply</strong>
+              <div>{{ message.admin_reply }}</div>
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No customer messages yet. Once someone uses the contact form, it will show up here for the admin team.</div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

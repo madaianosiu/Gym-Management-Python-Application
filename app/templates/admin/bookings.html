@@ -1,0 +1,87 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Admin Bookings{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <section class="admin-hero">
+    <div class="admin-kicker">Bookings</div>
+    <h1>Class reservations and training demand.</h1>
+    <p>Track who booked which class, when, and with which coach.</p>
+  </section>
+
+  <section class="admin-card admin-table-shell">
+    <div class="admin-table-toolbar">
+      <div>
+        <div class="admin-note">Class schedule</div>
+        <h2 class="admin-table-title">Customer class reservations</h2>
+        <p class="admin-table-subtitle">
+          Bookings are grouped by customer, class, coach, and schedule so the training calendar is easier to scan.
+        </p>
+      </div>
+      <div class="admin-table-count">
+        <span>Total bookings</span>
+        <strong>{{ bookings|length }}</strong>
+      </div>
+    </div>
+
+    {% if bookings %}
+      <div class="admin-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Class</th>
+              <th>Schedule</th>
+              <th>Coach</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+              {% set status = booking.status or "BOOKED" %}
+              <tr>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ booking.user_name or "Customer" }}</span>
+                    <span class="admin-cell-sub">{{ booking.user_email or "No email" }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ booking.class_name or "No class" }}</span>
+                    <span class="admin-cell-sub">{{ booking.level or "All levels" }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ booking.day }} at {{ booking.time }}</span>
+                    <span class="admin-cell-sub">{{ booking.created_at[:10] if booking.created_at else "Booking date unavailable" }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="admin-cell-stack">
+                    <span class="admin-cell-main">{{ booking.coach or "No coach" }}</span>
+                    <span class="admin-cell-sub">{{ booking.duration or "Duration not saved" }}</span>
+                  </div>
+                </td>
+                <td class="is-nowrap">
+                  <span class="admin-badge {{ 'is-success' if status == 'BOOKED' else 'is-warning' }}">
+                    {{ status }}
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">No class bookings yet.</div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

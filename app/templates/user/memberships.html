@@ -1,0 +1,442 @@
+{% extends "shared/base.html" %}
+
+{% block title %}GYM+ | Memberships{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
+<style>
+  .plans-hero {
+    display: block;
+    margin: 28px 0 22px;
+  }
+
+  .plans-hero-copy {
+    max-width: 760px;
+  }
+
+  .plans-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 160, 255, 0.18);
+    background: rgba(21, 31, 73, 0.45);
+    color: #b9c8ff;
+    font-size: 13px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(10px);
+  }
+
+  .plans-sub {
+    max-width: 620px;
+    color: rgba(226, 232, 255, 0.78);
+  }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 28px;
+    perspective: 1600px;
+  }
+
+  .plan-card {
+    position: relative;
+    min-height: 460px;
+  }
+
+  .plan-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 460px;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .plan-card.is-flipped .plan-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .plan-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+      radial-gradient(circle at top right, rgba(72, 115, 255, 0.22), transparent 30%),
+      linear-gradient(180deg, rgba(18, 25, 57, 0.96), rgba(8, 14, 36, 0.98));
+    box-shadow:
+      0 20px 50px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .plan-face.back {
+    transform: rotateY(180deg);
+  }
+
+  .plan-face-inner {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 460px;
+  }
+
+  .plan-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-right: -4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(126,163,255,0.45) rgba(255,255,255,0.04);
+  }
+
+  .plan-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .plan-scroll::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.04);
+    border-radius: 999px;
+  }
+
+  .plan-scroll::-webkit-scrollbar-thumb {
+    background: rgba(126,163,255,0.45);
+    border-radius: 999px;
+  }
+
+  .plan-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .plan-badge {
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(76, 110, 245, 0.16);
+    border: 1px solid rgba(123, 154, 255, 0.25);
+    color: #d9e3ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .plan-name {
+    font-size: 30px;
+    font-weight: 800;
+    margin: 8px 0 4px;
+    color: #f4f7ff;
+  }
+
+  .plan-desc {
+    color: rgba(223, 230, 255, 0.72);
+    margin-bottom: 20px;
+    min-height: 48px;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 10px 0 18px;
+  }
+
+  .plan-price strong {
+    font-size: 46px;
+    line-height: 1;
+    color: white;
+  }
+
+  .plan-price span {
+    color: rgba(215, 224, 255, 0.68);
+    font-size: 15px;
+  }
+
+  .plan-meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .plan-meta-box {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .plan-meta-label {
+    display: block;
+    font-size: 12px;
+    color: rgba(209, 218, 255, 0.62);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .plan-meta-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f4f7ff;
+  }
+
+  .plan-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .plan-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: rgba(235, 240, 255, 0.85);
+  }
+
+  .plan-list li::before {
+    content: "✦";
+    color: #7ea3ff;
+    margin-top: 1px;
+  }
+
+  .plan-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-secondary-modern {
+    background: rgba(255,255,255,0.05);
+    color: #eef3ff;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .btn-secondary-modern:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .plan-highlight {
+    position: relative;
+  }
+
+  .plan-highlight::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 28px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(126,163,255,0.7), rgba(81,113,255,0.08), rgba(126,163,255,0.28));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .plan-back-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .plan-back-copy {
+    color: rgba(224, 232, 255, 0.78);
+    margin-bottom: 18px;
+  }
+
+  .plan-back-section {
+    margin-bottom: 18px;
+  }
+
+  .plan-back-section h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(184, 201, 255, 0.72);
+  }
+
+  @media (max-width: 1100px) {
+    .plans-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .plan-card,
+    .plan-card-inner {
+      min-height: 420px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="plans-hero">
+  <div class="plans-hero-copy">
+    <div class="plans-kicker">2026 Membership Experience</div>
+    <h1 class="h1">Choose the plan that fits your training style</h1>
+    <p class="p plans-sub">
+      Explore each membership in a more modern way. Tap <strong>Details</strong> to flip the card
+      and see what’s included before checkout.
+    </p>
+  </div>
+</section>
+
+<section class="plans-grid">
+  {% for p in plans %}
+    {% set lower = p.name|lower %}
+    {% set badge = "Starter" %}
+    {% set desc = "A clean entry plan for members building consistency." %}
+    {% set audience = "Beginners, casual training, simple routine." %}
+    {% set features = [
+      "Full gym floor access",
+      "Standard locker room access",
+      "Basic onboarding support",
+      "Mobile booking access"
+    ] %}
+
+    {% if lower == "pro" %}
+      {% set badge = "Most Popular" %}
+      {% set desc = "Balanced performance plan for members who train seriously every week." %}
+      {% set audience = "Intermediate members, strength training, routine-focused users." %}
+      {% set features = [
+        "Everything in Basic",
+        "Group classes included",
+        "Priority booking windows",
+        "Monthly progress check-in"
+      ] %}
+    {% elif lower == "elite" %}
+      {% set badge = "Premium" %}
+      {% set desc = "A high-end experience with advanced support and premium access." %}
+      {% set audience = "Advanced members, transformation goals, premium experience." %}
+      {% set features = [
+        "Everything in Pro",
+        "Premium recovery zone access",
+        "1-on-1 coaching consult",
+        "VIP support and early access"
+      ] %}
+    {% endif %}
+
+    <article class="plan-card {% if lower == 'pro' %}plan-highlight{% endif %}" data-plan-card>
+      <div class="plan-card-inner">
+        <div class="plan-face front">
+          <div class="plan-face-inner">
+            <div class="plan-top">
+              <div>
+                <div class="plan-badge">{{ badge }}</div>
+                <div class="plan-name">{{ p.name }}</div>
+              </div>
+            </div>
+
+            <div class="plan-scroll">
+              <p class="plan-desc">{{ desc }}</p>
+
+              <div class="plan-price">
+                <strong>${{ p.price }}</strong>
+                <span>/ {{ p.duration_days }} days</span>
+              </div>
+
+              <div class="plan-meta">
+                <div class="plan-meta-box">
+                  <span class="plan-meta-label">Duration</span>
+                  <span class="plan-meta-value">{{ p.duration_days }} days</span>
+                </div>
+                <div class="plan-meta-box">
+                  <span class="plan-meta-label">Best for</span>
+                  <span class="plan-meta-value">
+                    {% if lower == "basic" %}Start{% elif lower == "pro" %}Progress{% else %}Peak{% endif %}
+                  </span>
+                </div>
+              </div>
+
+              <ul class="plan-list">
+                {% for feature in features[:3] %}
+                  <li>{{ feature }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div class="plan-actions">
+              <button type="button" class="btn btn-secondary-modern js-flip-btn">Details</button>
+              <a
+                class="btn btn-primary"
+                href="{{ url_for('user.checkout', plan=p.name, price=p.price, duration=p.duration_days) }}"
+              >
+                Select
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-face back">
+          <div class="plan-face-inner">
+            <div class="plan-scroll">
+              <div class="plan-back-title">{{ p.name }} — Details</div>
+              <p class="plan-back-copy">
+                This plan is designed for <strong>{{ audience }}</strong>
+              </p>
+
+              <div class="plan-back-section">
+                <h4>What you get</h4>
+                <ul class="plan-list">
+                  {% for feature in features %}
+                    <li>{{ feature }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <div class="plan-back-section">
+                <h4>Why choose it</h4>
+                <p class="p">
+                  {% if lower == "basic" %}
+                    Ideal if you want a clean, affordable starting point without overcomplicating your fitness journey.
+                  {% elif lower == "pro" %}
+                    Best balance between value and performance, with enough extras to feel like a serious upgrade.
+                  {% else %}
+                    Built for members who want the most complete gym experience, with premium perks and stronger support.
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <div class="plan-actions">
+              <button type="button" class="btn btn-secondary-modern js-flip-btn">Back</button>
+              <a
+                class="btn btn-primary"
+                href="{{ url_for('user.checkout', plan=p.name, price=p.price, duration=p.duration_days) }}"
+              >
+                Select this plan
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.querySelectorAll("[data-plan-card]").forEach((card) => {
+    const buttons = card.querySelectorAll(".js-flip-btn");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        card.classList.toggle("is-flipped");
+      });
+    });
+  });
+</script>
+{% endblock %}
